@@ -14,11 +14,11 @@ echo -e "${NC}"
 
 [[ $EUID -ne 0 ]] && SUDO="sudo" || SUDO=""
 
-read -p "Enter this device LAN IP (e.g. 192.168.51.199): " DEVICE_IP
-read -p "OpenRemote hostname [default: $DEVICE_IP]: " OR_HOSTNAME
+read -r -p "Enter this device LAN IP (e.g. 192.168.51.199): " DEVICE_IP
+read -r -p "OpenRemote hostname [default: $DEVICE_IP]: " OR_HOSTNAME
 OR_HOSTNAME=${OR_HOSTNAME:-$DEVICE_IP}
-read -p "Deploy Frigate NVR? (y/n): " DEPLOY_FRIGATE
-read -p "Deploy Zigbee2MQTT? (y/n): " DEPLOY_ZIGBEE
+read -r -p "Deploy Frigate NVR? (y/n): " DEPLOY_FRIGATE
+read -r -p "Deploy Zigbee2MQTT? (y/n): " DEPLOY_ZIGBEE
 
 info "Installing dependencies..."
 $SUDO apt-get update -qq
