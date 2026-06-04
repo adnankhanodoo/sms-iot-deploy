@@ -4,7 +4,6 @@ RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'; BLUE='\033[0;34m'; NC
 info()    { echo -e "${BLUE}[INFO]${NC} $1"; }
 success() { echo -e "${GREEN}[OK]${NC} $1"; }
 warn()    { echo -e "${YELLOW}[WARN]${NC} $1"; }
-error()   { echo -e "${RED}[ERROR]${NC} $1"; exit 1; }
 
 echo -e "${BLUE}"
 echo "╔══════════════════════════════════════════╗"
@@ -31,6 +30,16 @@ if ! command -v docker &>/dev/null; then
     success "Docker installed"
 fi
 
+INSTALL_DIR="${HOME}/sms-iot"
+info "Setting up in $INSTALL_DIR..."
+if [ -d "$INSTALL_DIR/.git" ]; then
+    info "Updating existing installation..."
+    git -C $INSTALL_DIR pull
+else
+    git clone https://github.com/adnankhanodoo/sms-iot-deploy.git $INSTALL_DIR
+fi
+cd $INSTALL_DIR
+
 info "Generating SSL certificate..."
 mkdir -p ssl
 openssl req -x509 -nodes -days 3650 -newkey rsa:2048 \
@@ -49,7 +58,8 @@ info "Updating configs with your IP..."
 sed -i "s/192.168.51.199/$DEVICE_IP/g" mosquitto/mosquitto.conf nginx/frigate-nginx.conf frigate/config/config.yml 2>/dev/null || true
 
 info "Generating docker-compose.yml..."
-python3 scripts/generate_compose.py "$DEVICE_IP" "$OR_HOSTNAME" "$DEPLOY_FRIGATE" "$DEPLOY_ZIGBEE"
+python3 $INSTALL_DIR/scripts/generate_compose.py "$DEVICE_IP" "$OR_HOSTNAME" "$DEPLOY_FRIGATE" "$DEPLOY_ZIGBEE"
+success "docker-compose.yml generated"
 
 info "Starting services..."
 docker compose pull
@@ -65,9 +75,9 @@ for i in $(seq 1 18); do
 done
 echo ""
 
-if [ -f "openremote/assets_backup.json" ]; then
+if [ -f "$INSTALL_DIR/openremote/assets_backup.json" ]; then
     info "Importing OpenRemote assets..."
-    python3 openremote/import_assets.py "$DEVICE_IP" && success "Assets imported" || warn "Asset import failed — run manually"
+    python3 $INSTALL_DIR/openremote/import_assets.py "$DEVICE_IP" && success "Assets imported" || warn "Asset import failed"
 fi
 
 echo ""
