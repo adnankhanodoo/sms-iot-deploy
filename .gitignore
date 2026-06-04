@@ -1,0 +1,9 @@
+ssl/
+docker-compose.yml
+.env
+zigbee2mqtt-data/devices.yaml
+zigbee2mqtt-data/database.db
+frigate/config/frigate.db*
+frigate/config/.jwt_secret
+frigate/config/model_cache/
+frigate/config/backup*

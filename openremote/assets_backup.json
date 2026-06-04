@@ -1,0 +1,1922 @@
+[
+  {
+    "id": "6Q5zfMsILFTMC1QXzNKLdR",
+    "version": 0,
+    "createdOn": 1779339654539,
+    "name": "Consoles",
+    "accessPublicRead": false,
+    "realm": "master",
+    "type": "GroupAsset",
+    "attributes": {
+      "notes": {
+        "name": "notes",
+        "type": "text",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779339654529
+      },
+      "location": {
+        "name": "location",
+        "type": "GEO_JSONPoint",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779339654529
+      },
+      "childAssetType": {
+        "name": "childAssetType",
+        "type": "assetType",
+        "meta": {
+          "readOnly": true
+        },
+        "value": "ConsoleAsset",
+        "timestamp": 1779339654529
+      }
+    }
+  },
+  {
+    "id": "6ckVIvsM8xYiouE2gtgVhz",
+    "version": 0,
+    "createdOn": 1779339654597,
+    "name": "Chrome",
+    "accessPublicRead": false,
+    "parentId": "6Q5zfMsILFTMC1QXzNKLdR",
+    "realm": "master",
+    "type": "ConsoleAsset",
+    "attributes": {
+      "consoleVersion": {
+        "name": "consoleVersion",
+        "type": "text",
+        "meta": {},
+        "value": "148.0.0.0",
+        "timestamp": 1779339654586
+      },
+      "consolePlatform": {
+        "name": "consolePlatform",
+        "type": "text",
+        "meta": {},
+        "value": "Windows 10 64-bit",
+        "timestamp": 1779339654586
+      },
+      "notes": {
+        "name": "notes",
+        "type": "text",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779339654586
+      },
+      "consoleProviders": {
+        "name": "consoleProviders",
+        "type": "consoleProviders",
+        "meta": {},
+        "value": {
+          "push": {
+            "version": "web",
+            "requiresPermission": false,
+            "hasPermission": true,
+            "success": true,
+            "enabled": true,
+            "disabled": false
+          }
+        },
+        "timestamp": 1779339654586
+      },
+      "consoleName": {
+        "name": "consoleName",
+        "type": "text",
+        "meta": {},
+        "value": "Chrome",
+        "timestamp": 1779339654586
+      },
+      "location": {
+        "name": "location",
+        "type": "GEO_JSONPoint",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779339654586
+      }
+    }
+  },
+  {
+    "id": "5Pk2o24bB4g1eHgpqRr9GM",
+    "version": 13,
+    "createdOn": 1779339814764,
+    "name": "Gate Lock",
+    "accessPublicRead": false,
+    "realm": "master",
+    "type": "PlugAsset",
+    "attributes": {
+      "customAssetType": {
+        "name": "customAssetType",
+        "type": "text",
+        "meta": {},
+        "value": "ToggleableDoorLockAsset",
+        "timestamp": 1779341114589
+      },
+      "notes": {
+        "name": "notes",
+        "type": "text",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779339814762
+      },
+      "location": {
+        "name": "location",
+        "type": "GEO_JSONPoint",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779339814762
+      },
+      "onOff": {
+        "name": "onOff",
+        "type": "boolean",
+        "meta": {
+          "storeDataPoints": true,
+          "accessPublicWrite": true,
+          "agentLink": {
+            "type": "MQTTAgentLink",
+            "id": "6a4ABeS31zuxTF9qnmpibT",
+            "valueFilters": [
+              {
+                "type": "jsonPath",
+                "path": "$.state",
+                "returnFirst": true,
+                "returnLast": false
+              }
+            ],
+            "valueConverter": {
+              "ON": true,
+              "OFF": false
+            },
+            "writeValueConverter": {
+              "TRUE": "{\"state\":\"ON\"}",
+              "FALSE": "{\"state\":\"OFF\"}"
+            },
+            "subscriptionTopic": "zigbee2mqtt/doorlockrndhall",
+            "publishTopic": "zigbee2mqtt/doorlockrndhall/set"
+          },
+          "accessPublicRead": true
+        },
+        "value": false,
+        "timestamp": 1780477540876
+      }
+    }
+  },
+  {
+    "id": "5vTMrzWSFWks8xbsbztZH5",
+    "version": 11,
+    "createdOn": 1779339880818,
+    "name": "Led Light",
+    "accessPublicRead": false,
+    "realm": "master",
+    "type": "LightAsset",
+    "attributes": {
+      "customAssetType": {
+        "name": "customAssetType",
+        "type": "text",
+        "meta": {},
+        "value": "LightAsset",
+        "timestamp": 1779341078311
+      },
+      "notes": {
+        "name": "notes",
+        "type": "text",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779339880815
+      },
+      "brightness": {
+        "name": "brightness",
+        "type": "positiveInteger",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779339880815
+      },
+      "colourTemperature": {
+        "name": "colourTemperature",
+        "type": "positiveInteger",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779339880815
+      },
+      "location": {
+        "name": "location",
+        "type": "GEO_JSONPoint",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779339880815
+      },
+      "colourRGB": {
+        "name": "colourRGB",
+        "type": "colourRGB",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779354780503
+      },
+      "onOff": {
+        "name": "onOff",
+        "type": "boolean",
+        "meta": {
+          "storeDataPoints": true,
+          "accessPublicWrite": true,
+          "agentLink": {
+            "type": "MQTTAgentLink",
+            "id": "6a4ABeS31zuxTF9qnmpibT",
+            "valueFilters": [
+              {
+                "type": "jsonPath",
+                "path": "$.state_l2",
+                "returnFirst": true,
+                "returnLast": false
+              }
+            ],
+            "valueConverter": {
+              "ON": true,
+              "OFF": false
+            },
+            "writeValueConverter": {
+              "TRUE": {
+                "state_l2": "ON"
+              },
+              "FALSE": {
+                "state_l2": "OFF"
+              }
+            },
+            "subscriptionTopic": "zigbee2mqtt/smartroom",
+            "publishTopic": "zigbee2mqtt/smartroom/set"
+          },
+          "accessPublicRead": true
+        },
+        "value": false,
+        "timestamp": 1780486552397
+      }
+    }
+  },
+  {
+    "id": "45mwqEelx9QcRkogTiiAR4",
+    "version": 12,
+    "createdOn": 1779339952286,
+    "name": "Buzzer",
+    "accessPublicRead": false,
+    "realm": "master",
+    "type": "PlugAsset",
+    "attributes": {
+      "customAssetType": {
+        "name": "customAssetType",
+        "type": "text",
+        "meta": {},
+        "value": "AlarmAsset",
+        "timestamp": 1779340935454
+      },
+      "notes": {
+        "name": "notes",
+        "type": "text",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779339952284
+      },
+      "location": {
+        "name": "location",
+        "type": "GEO_JSONPoint",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779339952284
+      },
+      "onOff": {
+        "name": "onOff",
+        "type": "boolean",
+        "meta": {
+          "accessPublicWrite": true,
+          "agentLink": {
+            "type": "MQTTAgentLink",
+            "id": "6a4ABeS31zuxTF9qnmpibT",
+            "valueFilters": [
+              {
+                "type": "jsonPath",
+                "path": "$.state_l1",
+                "returnFirst": false,
+                "returnLast": false
+              }
+            ],
+            "valueConverter": {
+              "ON": true,
+              "OFF": false
+            },
+            "writeValueConverter": {
+              "TRUE": {
+                "state_l1": "ON"
+              },
+              "FALSE": {
+                "state_l1": "OFF"
+              }
+            },
+            "subscriptionTopic": "zigbee2mqtt/smartroom",
+            "publishTopic": "zigbee2mqtt/smartroom/set"
+          },
+          "accessPublicRead": true
+        },
+        "value": false,
+        "timestamp": 1780486552397
+      }
+    }
+  },
+  {
+    "id": "4FllU2XQOlcx67L1cO9btj",
+    "version": 60,
+    "createdOn": 1779340006545,
+    "name": "PTZ S",
+    "accessPublicRead": false,
+    "realm": "master",
+    "type": "ThingAsset",
+    "attributes": {
+      "streamUrl": {
+        "name": "streamUrl",
+        "type": "text",
+        "meta": {},
+        "value": "https://100.84.236.75:4431/go2rtc/stream.html?src=cam243",
+        "timestamp": 1780480925118
+      },
+      "ptzId": {
+        "name": "ptzId",
+        "type": "text",
+        "meta": {
+          "ruleState": true,
+          "storeDataPoints": true,
+          "agentLink": {
+            "type": "MQTTAgentLink",
+            "id": "7SSv4xc49ULEj5xPDZ0lyH"
+          }
+        },
+        "value": "cam243",
+        "timestamp": 1780472526511
+      },
+      "eventId": {
+        "name": "eventId",
+        "type": "text",
+        "meta": {
+          "ruleState": true,
+          "storeDataPoints": true,
+          "accessPublicWrite": true,
+          "agentLink": {
+            "type": "MQTTAgentLink",
+            "id": "7SSv4xc49ULEj5xPDZ0lyH",
+            "valueFilters": [
+              {
+                "type": "jsonPath",
+                "path": "$[?(@.type == 'new')].after[?(@.camera == 'cam243')]['id','label']",
+                "returnFirst": false,
+                "returnLast": false
+              },
+              {
+                "type": "regex",
+                "pattern": "\\[.+\\]",
+                "matchGroup": 0,
+                "matchIndex": 0
+              }
+            ],
+            "updateOnWrite": true,
+            "subscriptionTopic": "frigate-165/events"
+          },
+          "accessPublicRead": true
+        },
+        "value": null,
+        "timestamp": 1780593485340
+      },
+      "customAssetType": {
+        "name": "customAssetType",
+        "type": "text",
+        "meta": {},
+        "value": "PtzCameraAsset",
+        "timestamp": 1779442088615
+      },
+      "notes": {
+        "name": "notes",
+        "type": "text",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779340006543
+      },
+      "ptzCommand": {
+        "name": "ptzCommand",
+        "type": "text",
+        "meta": {
+          "storeDataPoints": true,
+          "agentLink": {
+            "type": "MQTTAgentLink",
+            "id": "7SSv4xc49ULEj5xPDZ0lyH",
+            "publishTopic": "frigate-165/cam243/ptz"
+          }
+        },
+        "value": null,
+        "timestamp": 1780472588764
+      },
+      "location": {
+        "name": "location",
+        "type": "GEO_JSONPoint",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779340006543
+      },
+      "id": {
+        "name": "id",
+        "type": "text",
+        "meta": {
+          "ruleState": true,
+          "storeDataPoints": true,
+          "accessPublicWrite": true,
+          "agentLink": {
+            "type": "MQTTAgentLink",
+            "id": "7SSv4xc49ULEj5xPDZ0lyH",
+            "valueFilters": [
+              {
+                "type": "jsonPath",
+                "path": "$.after.id",
+                "returnFirst": true,
+                "returnLast": false
+              }
+            ],
+            "updateOnWrite": true,
+            "subscriptionTopic": "frigate-165/events"
+          },
+          "accessPublicRead": true
+        },
+        "value": "1780593473.42479-mjh7vs",
+        "timestamp": 1780593485337
+      },
+      "snapshot": {
+        "name": "snapshot",
+        "type": "text",
+        "meta": {
+          "storeDataPoints": true,
+          "agentLink": {
+            "type": "MQTTAgentLink",
+            "id": "7SSv4xc49ULEj5xPDZ0lyH",
+            "subscriptionTopic": "frigate-16/cam243/person/snapshot"
+          }
+        },
+        "value": null,
+        "timestamp": 1779469110836
+      },
+      "isPerson": {
+        "name": "isPerson",
+        "type": "boolean",
+        "meta": {
+          "ruleState": true,
+          "storeDataPoints": true,
+          "accessPublicWrite": true,
+          "agentLink": {
+            "type": "MQTTAgentLink",
+            "id": "7SSv4xc49ULEj5xPDZ0lyH",
+            "valueFilters": [
+              {
+                "type": "jsonPath",
+                "path": "$[?(@.type == 'new')].after[?(@.camera == 'cam243' && @.label == 'person')]['id','label']",
+                "returnFirst": false,
+                "returnLast": false
+              },
+              {
+                "type": "regex",
+                "pattern": "\\[.+\\]",
+                "matchGroup": 0,
+                "matchIndex": 0
+              }
+            ],
+            "writeValue": "true",
+            "updateOnWrite": true,
+            "subscriptionTopic": "frigate-165/events"
+          },
+          "accessPublicRead": true
+        },
+        "value": null,
+        "timestamp": 1780593485335
+      },
+      "personCount": {
+        "name": "personCount",
+        "type": "number",
+        "meta": {
+          "ruleState": true,
+          "storeDataPoints": true,
+          "accessPublicWrite": true,
+          "agentLink": {
+            "type": "MQTTAgentLink",
+            "id": "7SSv4xc49ULEj5xPDZ0lyH",
+            "subscriptionTopic": "frigate-165/cam243/person/active"
+          },
+          "accessPublicRead": true
+        },
+        "value": 0.0,
+        "timestamp": 1780593485947
+      }
+    }
+  },
+  {
+    "id": "5jcXIa96aFDIlLgOaU5pDn",
+    "version": 21,
+    "createdOn": 1779340029756,
+    "name": "Parking Camera (S)",
+    "accessPublicRead": false,
+    "realm": "master",
+    "type": "ThingAsset",
+    "attributes": {
+      "streamUrl": {
+        "name": "streamUrl",
+        "type": "text",
+        "meta": {},
+        "value": "https://100.84.236.75:4431/go2rtc/stream.html?src=cam242",
+        "timestamp": 1780396125417
+      },
+      "eventId": {
+        "name": "eventId",
+        "type": "text",
+        "meta": {
+          "ruleState": true,
+          "storeDataPoints": true,
+          "accessPublicWrite": true,
+          "agentLink": {
+            "type": "MQTTAgentLink",
+            "id": "7SSv4xc49ULEj5xPDZ0lyH",
+            "valueFilters": [
+              {
+                "type": "jsonPath",
+                "path": "$[?(@.type == 'new')].after[?(@.camera == 'cam242')]['id','label']",
+                "returnFirst": false,
+                "returnLast": false
+              },
+              {
+                "type": "regex",
+                "pattern": "\\[.+\\]",
+                "matchGroup": 0,
+                "matchIndex": 0
+              }
+            ],
+            "updateOnWrite": true,
+            "subscriptionTopic": "frigate-165/events"
+          },
+          "accessPublicRead": true
+        },
+        "value": null,
+        "timestamp": 1780593485338
+      },
+      "customAssetType": {
+        "name": "customAssetType",
+        "type": "text",
+        "meta": {},
+        "value": "CameraAsset",
+        "timestamp": 1779341187612
+      },
+      "notes": {
+        "name": "notes",
+        "type": "text",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779340029755
+      },
+      "location": {
+        "name": "location",
+        "type": "GEO_JSONPoint",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779340029755
+      },
+      "id": {
+        "name": "id",
+        "type": "text",
+        "meta": {
+          "ruleState": true,
+          "accessPublicWrite": true,
+          "agentLink": {
+            "type": "MQTTAgentLink",
+            "id": "7SSv4xc49ULEj5xPDZ0lyH",
+            "valueFilters": [
+              {
+                "type": "jsonPath",
+                "path": "$[?(@.after.camera == 'cam242' && @.after.label == 'person')].after.id",
+                "returnFirst": true,
+                "returnLast": false
+              }
+            ],
+            "updateOnWrite": true,
+            "subscriptionTopic": "frigate-165/events"
+          },
+          "accessPublicRead": true
+        },
+        "value": null,
+        "timestamp": 1780593485336
+      },
+      "personCount": {
+        "name": "personCount",
+        "type": "number",
+        "meta": {
+          "ruleState": true,
+          "accessPublicWrite": true,
+          "agentLink": {
+            "type": "MQTTAgentLink",
+            "id": "7SSv4xc49ULEj5xPDZ0lyH",
+            "subscriptionTopic": "frigate-165/cam242/person/active"
+          },
+          "accessPublicRead": true
+        },
+        "value": 0.0,
+        "timestamp": 1780568443201
+      }
+    }
+  },
+  {
+    "id": "5EB4P8ZTpa98cRgC4sD6Cq",
+    "version": 22,
+    "createdOn": 1779340103831,
+    "name": "temperature Sensor",
+    "accessPublicRead": false,
+    "realm": "master",
+    "type": "WeatherAsset",
+    "attributes": {
+      "sunIrradiance": {
+        "name": "sunIrradiance",
+        "type": "positiveNumber",
+        "meta": {
+          "readOnly": true
+        },
+        "value": null,
+        "timestamp": 1779340103827
+      },
+      "customAssetType": {
+        "name": "customAssetType",
+        "type": "text",
+        "meta": {},
+        "value": "HeatSensorAsset",
+        "timestamp": 1779341057342
+      },
+      "rainfall": {
+        "name": "rainfall",
+        "type": "positiveNumber",
+        "meta": {
+          "readOnly": true
+        },
+        "value": null,
+        "timestamp": 1779340103827
+      },
+      "notes": {
+        "name": "notes",
+        "type": "text",
+        "meta": {
+          "agentLink": {
+            "type": "MQTTAgentLink",
+            "id": "6a4ABeS31zuxTF9qnmpibT",
+            "subscriptionTopic": "zigbee2mqtt/temp199"
+          },
+          "accessPublicRead": true
+        },
+        "value": "{\"battery\":99,\"humidity\":39.7,\"last_seen\":\"2026-06-01T07:41:11.032Z\",\"linkquality\":138,\"temperature\":29.4,\"voltage\":3000}",
+        "timestamp": 1780562026267
+      },
+      "uVIndex": {
+        "name": "uVIndex",
+        "type": "positiveNumber",
+        "meta": {
+          "readOnly": true,
+          "label": "UV index"
+        },
+        "value": null,
+        "timestamp": 1779340103827
+      },
+      "sunAzimuth": {
+        "name": "sunAzimuth",
+        "type": "positiveNumber",
+        "meta": {
+          "readOnly": true
+        },
+        "value": null,
+        "timestamp": 1779340103827
+      },
+      "sunZenith": {
+        "name": "sunZenith",
+        "type": "positiveNumber",
+        "meta": {
+          "readOnly": true
+        },
+        "value": null,
+        "timestamp": 1779340103827
+      },
+      "Battery": {
+        "name": "Battery",
+        "type": "number",
+        "meta": {
+          "storeDataPoints": true,
+          "agentLink": {
+            "type": "MQTTAgentLink",
+            "id": "6a4ABeS31zuxTF9qnmpibT",
+            "valueFilters": [
+              {
+                "type": "jsonPath",
+                "path": "$.battery",
+                "returnFirst": false,
+                "returnLast": false
+              }
+            ],
+            "subscriptionTopic": "zigbee2mqtt/temp199"
+          },
+          "accessPublicRead": true
+        },
+        "value": 99.0,
+        "timestamp": 1780562026266
+      },
+      "temperature": {
+        "name": "temperature",
+        "type": "number",
+        "meta": {
+          "storeDataPoints": true,
+          "agentLink": {
+            "type": "MQTTAgentLink",
+            "id": "6a4ABeS31zuxTF9qnmpibT",
+            "valueFilters": [
+              {
+                "type": "jsonPath",
+                "path": "$.temperature",
+                "returnFirst": false,
+                "returnLast": false
+              }
+            ],
+            "subscriptionTopic": "zigbee2mqtt/temp199"
+          },
+          "accessPublicRead": true,
+          "readOnly": true
+        },
+        "value": 29.4,
+        "timestamp": 1780562026266
+      },
+      "humidity": {
+        "name": "humidity",
+        "type": "positiveInteger",
+        "meta": {
+          "storeDataPoints": true,
+          "agentLink": {
+            "type": "MQTTAgentLink",
+            "id": "6a4ABeS31zuxTF9qnmpibT",
+            "valueFilters": [
+              {
+                "type": "jsonPath",
+                "path": "$.humidity",
+                "returnFirst": false,
+                "returnLast": false
+              }
+            ],
+            "subscriptionTopic": "zigbee2mqtt/temp199"
+          },
+          "accessPublicRead": true,
+          "readOnly": true
+        },
+        "value": 39,
+        "timestamp": 1780562026266
+      },
+      "location": {
+        "name": "location",
+        "type": "GEO_JSONPoint",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779340103827
+      },
+      "windDirection": {
+        "name": "windDirection",
+        "type": "direction",
+        "meta": {
+          "readOnly": true
+        },
+        "value": null,
+        "timestamp": 1779340103827
+      },
+      "windSpeed": {
+        "name": "windSpeed",
+        "type": "positiveNumber",
+        "meta": {
+          "readOnly": true
+        },
+        "value": null,
+        "timestamp": 1779340103827
+      },
+      "sunAltitude": {
+        "name": "sunAltitude",
+        "type": "positiveNumber",
+        "meta": {
+          "readOnly": true
+        },
+        "value": null,
+        "timestamp": 1779340103827
+      }
+    }
+  },
+  {
+    "id": "6jv5wAqsaFjlv7Zb3GqB4m",
+    "version": 3,
+    "createdOn": 1779341611351,
+    "name": "Tower_ISB",
+    "accessPublicRead": false,
+    "realm": "master",
+    "type": "MQTTAgent",
+    "attributes": {
+      "subscribeQos": {
+        "name": "subscribeQos",
+        "type": "MQTTQos",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779341611342
+      },
+      "wildcardSubscriptionTopics": {
+        "name": "wildcardSubscriptionTopics",
+        "type": "text[]",
+        "meta": {},
+        "value": [],
+        "timestamp": 1779341611342
+      },
+      "notes": {
+        "name": "notes",
+        "type": "text",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779341611342
+      },
+      "clientId": {
+        "name": "clientId",
+        "type": "text",
+        "meta": {},
+        "value": "",
+        "timestamp": 1779341660687
+      },
+      "publishQos": {
+        "name": "publishQos",
+        "type": "MQTTQos",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779341611342
+      },
+      "websocketPath": {
+        "name": "websocketPath",
+        "type": "text",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779341611342
+      },
+      "websocketQuery": {
+        "name": "websocketQuery",
+        "type": "text",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779341611342
+      },
+      "agentDisabled": {
+        "name": "agentDisabled",
+        "type": "boolean",
+        "meta": {},
+        "value": false,
+        "timestamp": 1779358971204
+      },
+      "certificateAlias": {
+        "name": "certificateAlias",
+        "type": "text",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779341611342
+      },
+      "agentStatus": {
+        "name": "agentStatus",
+        "type": "connectionStatus",
+        "meta": {
+          "readOnly": true
+        },
+        "value": "CONNECTED",
+        "timestamp": 1780592732169
+      },
+      "websocketMode": {
+        "name": "websocketMode",
+        "type": "boolean",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779341611342
+      },
+      "lastWillTopic": {
+        "name": "lastWillTopic",
+        "type": "text",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779341611342
+      },
+      "lastWillRetain": {
+        "name": "lastWillRetain",
+        "type": "boolean",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779341611342
+      },
+      "port": {
+        "name": "port",
+        "type": "TCP_IPPortNumber",
+        "meta": {},
+        "value": 1883,
+        "timestamp": 1779341660687
+      },
+      "resumeSession": {
+        "name": "resumeSession",
+        "type": "boolean",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779341611342
+      },
+      "host": {
+        "name": "host",
+        "type": "hostOrIPAddress",
+        "meta": {},
+        "value": "192.168.51.199",
+        "timestamp": 1780581032475
+      },
+      "lastWillPayload": {
+        "name": "lastWillPayload",
+        "type": "text",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779341611342
+      },
+      "location": {
+        "name": "location",
+        "type": "GEO_JSONPoint",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779341611342
+      },
+      "secureMode": {
+        "name": "secureMode",
+        "type": "boolean",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779341611342
+      }
+    }
+  },
+  {
+    "id": "6zyFQV84mqzUaR6cHNghOj",
+    "version": 0,
+    "createdOn": 1779342270713,
+    "name": "Chrome",
+    "accessPublicRead": false,
+    "parentId": "6Q5zfMsILFTMC1QXzNKLdR",
+    "realm": "master",
+    "type": "ConsoleAsset",
+    "attributes": {
+      "consoleVersion": {
+        "name": "consoleVersion",
+        "type": "text",
+        "meta": {},
+        "value": "147.0.0.0",
+        "timestamp": 1779342270711
+      },
+      "consolePlatform": {
+        "name": "consolePlatform",
+        "type": "text",
+        "meta": {},
+        "value": "Linux 64-bit",
+        "timestamp": 1779342270711
+      },
+      "notes": {
+        "name": "notes",
+        "type": "text",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779342270711
+      },
+      "consoleProviders": {
+        "name": "consoleProviders",
+        "type": "consoleProviders",
+        "meta": {},
+        "value": {
+          "push": {
+            "version": "web",
+            "requiresPermission": false,
+            "hasPermission": true,
+            "success": true,
+            "enabled": true,
+            "disabled": false
+          }
+        },
+        "timestamp": 1779342270711
+      },
+      "consoleName": {
+        "name": "consoleName",
+        "type": "text",
+        "meta": {},
+        "value": "Chrome",
+        "timestamp": 1779342270711
+      },
+      "location": {
+        "name": "location",
+        "type": "GEO_JSONPoint",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779342270711
+      }
+    }
+  },
+  {
+    "id": "6a4ABeS31zuxTF9qnmpibT",
+    "version": 3,
+    "createdOn": 1779351116051,
+    "name": "mqtt2",
+    "accessPublicRead": false,
+    "realm": "master",
+    "type": "MQTTAgent",
+    "attributes": {
+      "subscribeQos": {
+        "name": "subscribeQos",
+        "type": "MQTTQos",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779351116049
+      },
+      "wildcardSubscriptionTopics": {
+        "name": "wildcardSubscriptionTopics",
+        "type": "text[]",
+        "meta": {},
+        "value": [],
+        "timestamp": 1779351116974
+      },
+      "notes": {
+        "name": "notes",
+        "type": "text",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779351116049
+      },
+      "clientId": {
+        "name": "clientId",
+        "type": "text",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779351116049
+      },
+      "publishQos": {
+        "name": "publishQos",
+        "type": "MQTTQos",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779351116049
+      },
+      "websocketPath": {
+        "name": "websocketPath",
+        "type": "text",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779351116049
+      },
+      "websocketQuery": {
+        "name": "websocketQuery",
+        "type": "text",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779351116049
+      },
+      "agentDisabled": {
+        "name": "agentDisabled",
+        "type": "boolean",
+        "meta": {},
+        "value": false,
+        "timestamp": 1780463097223
+      },
+      "certificateAlias": {
+        "name": "certificateAlias",
+        "type": "text",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779351116049
+      },
+      "agentStatus": {
+        "name": "agentStatus",
+        "type": "connectionStatus",
+        "meta": {
+          "readOnly": true
+        },
+        "value": "CONNECTED",
+        "timestamp": 1780592732169
+      },
+      "websocketMode": {
+        "name": "websocketMode",
+        "type": "boolean",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779351116049
+      },
+      "lastWillTopic": {
+        "name": "lastWillTopic",
+        "type": "text",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779351116049
+      },
+      "lastWillRetain": {
+        "name": "lastWillRetain",
+        "type": "boolean",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779351116049
+      },
+      "port": {
+        "name": "port",
+        "type": "TCP_IPPortNumber",
+        "meta": {},
+        "value": 1883,
+        "timestamp": 1779354302502
+      },
+      "resumeSession": {
+        "name": "resumeSession",
+        "type": "boolean",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779351116049
+      },
+      "host": {
+        "name": "host",
+        "type": "hostOrIPAddress",
+        "meta": {},
+        "value": "mosquitto",
+        "timestamp": 1780562125057
+      },
+      "lastWillPayload": {
+        "name": "lastWillPayload",
+        "type": "text",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779351116049
+      },
+      "location": {
+        "name": "location",
+        "type": "GEO_JSONPoint",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779351116049
+      },
+      "secureMode": {
+        "name": "secureMode",
+        "type": "boolean",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779351116049
+      }
+    }
+  },
+  {
+    "id": "5P60XbkzIwPuh619bQZE2n",
+    "version": 0,
+    "createdOn": 1779355956289,
+    "name": "Chrome",
+    "accessPublicRead": false,
+    "parentId": "6Q5zfMsILFTMC1QXzNKLdR",
+    "realm": "master",
+    "type": "ConsoleAsset",
+    "attributes": {
+      "consoleVersion": {
+        "name": "consoleVersion",
+        "type": "text",
+        "meta": {},
+        "value": "148.0.0.0",
+        "timestamp": 1779355956267
+      },
+      "consolePlatform": {
+        "name": "consolePlatform",
+        "type": "text",
+        "meta": {},
+        "value": "OS X 10.15.7 64-bit",
+        "timestamp": 1779355956267
+      },
+      "notes": {
+        "name": "notes",
+        "type": "text",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779355956267
+      },
+      "consoleProviders": {
+        "name": "consoleProviders",
+        "type": "consoleProviders",
+        "meta": {},
+        "value": {
+          "push": {
+            "version": "web",
+            "requiresPermission": false,
+            "hasPermission": true,
+            "success": true,
+            "enabled": true,
+            "disabled": false
+          }
+        },
+        "timestamp": 1779355956267
+      },
+      "consoleName": {
+        "name": "consoleName",
+        "type": "text",
+        "meta": {},
+        "value": "Chrome",
+        "timestamp": 1779355956267
+      },
+      "location": {
+        "name": "location",
+        "type": "GEO_JSONPoint",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779355956267
+      }
+    }
+  },
+  {
+    "id": "2Bsfh9ihJL4Lz17o8eZizI",
+    "version": 0,
+    "createdOn": 1779358442875,
+    "name": "Chrome",
+    "accessPublicRead": false,
+    "parentId": "6Q5zfMsILFTMC1QXzNKLdR",
+    "realm": "master",
+    "type": "ConsoleAsset",
+    "attributes": {
+      "consoleVersion": {
+        "name": "consoleVersion",
+        "type": "text",
+        "meta": {},
+        "value": "147.0.0.0",
+        "timestamp": 1779358442852
+      },
+      "consolePlatform": {
+        "name": "consolePlatform",
+        "type": "text",
+        "meta": {},
+        "value": "Linux 64-bit",
+        "timestamp": 1779358442852
+      },
+      "notes": {
+        "name": "notes",
+        "type": "text",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779358442852
+      },
+      "consoleProviders": {
+        "name": "consoleProviders",
+        "type": "consoleProviders",
+        "meta": {},
+        "value": {
+          "push": {
+            "version": "web",
+            "requiresPermission": false,
+            "hasPermission": true,
+            "success": true,
+            "enabled": true,
+            "disabled": false
+          }
+        },
+        "timestamp": 1779358442852
+      },
+      "consoleName": {
+        "name": "consoleName",
+        "type": "text",
+        "meta": {},
+        "value": "Chrome",
+        "timestamp": 1779358442852
+      },
+      "location": {
+        "name": "location",
+        "type": "GEO_JSONPoint",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779358442852
+      }
+    }
+  },
+  {
+    "id": "7SSv4xc49ULEj5xPDZ0lyH",
+    "version": 3,
+    "createdOn": 1779359050085,
+    "name": "frigate mqtt",
+    "accessPublicRead": false,
+    "parentId": "45mwqEelx9QcRkogTiiAR4",
+    "realm": "master",
+    "type": "MQTTAgent",
+    "attributes": {
+      "subscribeQos": {
+        "name": "subscribeQos",
+        "type": "MQTTQos",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779359050078
+      },
+      "wildcardSubscriptionTopics": {
+        "name": "wildcardSubscriptionTopics",
+        "type": "text[]",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779359050078
+      },
+      "notes": {
+        "name": "notes",
+        "type": "text",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779359050078
+      },
+      "clientId": {
+        "name": "clientId",
+        "type": "text",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779359050078
+      },
+      "publishQos": {
+        "name": "publishQos",
+        "type": "MQTTQos",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779359050078
+      },
+      "websocketPath": {
+        "name": "websocketPath",
+        "type": "text",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779359050078
+      },
+      "websocketQuery": {
+        "name": "websocketQuery",
+        "type": "text",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779359050078
+      },
+      "agentDisabled": {
+        "name": "agentDisabled",
+        "type": "boolean",
+        "meta": {},
+        "value": false,
+        "timestamp": 1779359131410
+      },
+      "certificateAlias": {
+        "name": "certificateAlias",
+        "type": "text",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779359050078
+      },
+      "agentStatus": {
+        "name": "agentStatus",
+        "type": "connectionStatus",
+        "meta": {
+          "readOnly": true
+        },
+        "value": "CONNECTED",
+        "timestamp": 1780592732170
+      },
+      "websocketMode": {
+        "name": "websocketMode",
+        "type": "boolean",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779359050078
+      },
+      "lastWillTopic": {
+        "name": "lastWillTopic",
+        "type": "text",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779359050078
+      },
+      "lastWillRetain": {
+        "name": "lastWillRetain",
+        "type": "boolean",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779359050078
+      },
+      "port": {
+        "name": "port",
+        "type": "TCP_IPPortNumber",
+        "meta": {},
+        "value": 1883,
+        "timestamp": 1779359114641
+      },
+      "resumeSession": {
+        "name": "resumeSession",
+        "type": "boolean",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779359050078
+      },
+      "host": {
+        "name": "host",
+        "type": "hostOrIPAddress",
+        "meta": {},
+        "value": "192.168.51.199",
+        "timestamp": 1780581073132
+      },
+      "lastWillPayload": {
+        "name": "lastWillPayload",
+        "type": "text",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779359050078
+      },
+      "location": {
+        "name": "location",
+        "type": "GEO_JSONPoint",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779359050078
+      },
+      "secureMode": {
+        "name": "secureMode",
+        "type": "boolean",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779359050078
+      }
+    }
+  },
+  {
+    "id": "42NXZ5TSBGrjbPZdnCROWk",
+    "version": 0,
+    "createdOn": 1779374444169,
+    "name": "Chrome",
+    "accessPublicRead": false,
+    "parentId": "6Q5zfMsILFTMC1QXzNKLdR",
+    "realm": "master",
+    "type": "ConsoleAsset",
+    "attributes": {
+      "consoleVersion": {
+        "name": "consoleVersion",
+        "type": "text",
+        "meta": {},
+        "value": "148.0.0.0",
+        "timestamp": 1779374444161
+      },
+      "consolePlatform": {
+        "name": "consolePlatform",
+        "type": "text",
+        "meta": {},
+        "value": "Windows 10 64-bit",
+        "timestamp": 1779374444161
+      },
+      "notes": {
+        "name": "notes",
+        "type": "text",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779374444161
+      },
+      "consoleProviders": {
+        "name": "consoleProviders",
+        "type": "consoleProviders",
+        "meta": {},
+        "value": {
+          "push": {
+            "version": "web",
+            "requiresPermission": false,
+            "hasPermission": true,
+            "success": true,
+            "enabled": true,
+            "disabled": false
+          }
+        },
+        "timestamp": 1779374444161
+      },
+      "consoleName": {
+        "name": "consoleName",
+        "type": "text",
+        "meta": {},
+        "value": "Chrome",
+        "timestamp": 1779374444161
+      },
+      "location": {
+        "name": "location",
+        "type": "GEO_JSONPoint",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779374444161
+      }
+    }
+  },
+  {
+    "id": "54lg2usG1DBzMxEJVCu96F",
+    "version": 0,
+    "createdOn": 1779450350704,
+    "name": "Chrome",
+    "accessPublicRead": false,
+    "parentId": "6Q5zfMsILFTMC1QXzNKLdR",
+    "realm": "master",
+    "type": "ConsoleAsset",
+    "attributes": {
+      "consoleVersion": {
+        "name": "consoleVersion",
+        "type": "text",
+        "meta": {},
+        "value": "148.0.0.0",
+        "timestamp": 1779450350692
+      },
+      "consolePlatform": {
+        "name": "consolePlatform",
+        "type": "text",
+        "meta": {},
+        "value": "Windows 10 64-bit",
+        "timestamp": 1779450350692
+      },
+      "notes": {
+        "name": "notes",
+        "type": "text",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779450350692
+      },
+      "consoleProviders": {
+        "name": "consoleProviders",
+        "type": "consoleProviders",
+        "meta": {},
+        "value": {
+          "push": {
+            "version": "web",
+            "requiresPermission": false,
+            "hasPermission": true,
+            "success": true,
+            "enabled": true,
+            "disabled": false
+          }
+        },
+        "timestamp": 1779450350692
+      },
+      "consoleName": {
+        "name": "consoleName",
+        "type": "text",
+        "meta": {},
+        "value": "Chrome",
+        "timestamp": 1779450350692
+      },
+      "location": {
+        "name": "location",
+        "type": "GEO_JSONPoint",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779450350692
+      }
+    }
+  },
+  {
+    "id": "70dVR8dtdWTfOLgmYnyz3j",
+    "version": 0,
+    "createdOn": 1779467273612,
+    "name": "Microsoft Edge",
+    "accessPublicRead": false,
+    "parentId": "6Q5zfMsILFTMC1QXzNKLdR",
+    "realm": "master",
+    "type": "ConsoleAsset",
+    "attributes": {
+      "consoleVersion": {
+        "name": "consoleVersion",
+        "type": "text",
+        "meta": {},
+        "value": "148.0.0.0",
+        "timestamp": 1779467273603
+      },
+      "consolePlatform": {
+        "name": "consolePlatform",
+        "type": "text",
+        "meta": {},
+        "value": "Windows 10 64-bit",
+        "timestamp": 1779467273603
+      },
+      "notes": {
+        "name": "notes",
+        "type": "text",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779467273603
+      },
+      "consoleProviders": {
+        "name": "consoleProviders",
+        "type": "consoleProviders",
+        "meta": {},
+        "value": {
+          "push": {
+            "version": "web",
+            "requiresPermission": false,
+            "hasPermission": true,
+            "success": true,
+            "enabled": true,
+            "disabled": false
+          }
+        },
+        "timestamp": 1779467273603
+      },
+      "consoleName": {
+        "name": "consoleName",
+        "type": "text",
+        "meta": {},
+        "value": "Microsoft Edge",
+        "timestamp": 1779467273603
+      },
+      "location": {
+        "name": "location",
+        "type": "GEO_JSONPoint",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779467273603
+      }
+    }
+  },
+  {
+    "id": "4UKFn465WYq1ClgxbCIhyP",
+    "version": 0,
+    "createdOn": 1779517120828,
+    "name": "Chrome",
+    "accessPublicRead": false,
+    "parentId": "6Q5zfMsILFTMC1QXzNKLdR",
+    "realm": "master",
+    "type": "ConsoleAsset",
+    "attributes": {
+      "consoleVersion": {
+        "name": "consoleVersion",
+        "type": "text",
+        "meta": {},
+        "value": "148.0.0.0",
+        "timestamp": 1779517120803
+      },
+      "consolePlatform": {
+        "name": "consolePlatform",
+        "type": "text",
+        "meta": {},
+        "value": "Windows 10 64-bit",
+        "timestamp": 1779517120803
+      },
+      "notes": {
+        "name": "notes",
+        "type": "text",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779517120803
+      },
+      "consoleProviders": {
+        "name": "consoleProviders",
+        "type": "consoleProviders",
+        "meta": {},
+        "value": {
+          "push": {
+            "version": "web",
+            "requiresPermission": false,
+            "hasPermission": true,
+            "success": true,
+            "enabled": true,
+            "disabled": false
+          }
+        },
+        "timestamp": 1779517120803
+      },
+      "consoleName": {
+        "name": "consoleName",
+        "type": "text",
+        "meta": {},
+        "value": "Chrome",
+        "timestamp": 1779517120803
+      },
+      "location": {
+        "name": "location",
+        "type": "GEO_JSONPoint",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779517120803
+      }
+    }
+  },
+  {
+    "id": "4gHLDxMXRFVu1L6Dtl9I6n",
+    "version": 2,
+    "createdOn": 1779517152283,
+    "name": "PTT Assest",
+    "accessPublicRead": false,
+    "realm": "master",
+    "type": "ThingAsset",
+    "attributes": {
+      "notes": {
+        "name": "notes",
+        "type": "text",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779517152282
+      },
+      "socketIP": {
+        "name": "socketIP",
+        "type": "text",
+        "meta": {},
+        "value": "100.84.236.75:3000/ws",
+        "timestamp": 1780460498196
+      },
+      "location": {
+        "name": "location",
+        "type": "GEO_JSONPoint",
+        "meta": {},
+        "value": null,
+        "timestamp": 1779517152282
+      },
+      "ptzcommand": {
+        "name": "ptzcommand",
+        "type": "text",
+        "meta": {
+          "ruleState": true,
+          "storeDataPoints": true,
+          "agentLink": {
+            "type": "MQTTAgentLink",
+            "id": "7SSv4xc49ULEj5xPDZ0lyH",
+            "publishTopic": "frigate-165/cam243/ptz"
+          }
+        },
+        "value": null,
+        "timestamp": 1780472194228
+      }
+    }
+  },
+  {
+    "id": "5dN2KEXJeV77ZB57ZFQHmt",
+    "version": 0,
+    "createdOn": 1780396768978,
+    "name": "Microsoft Edge",
+    "accessPublicRead": false,
+    "parentId": "6Q5zfMsILFTMC1QXzNKLdR",
+    "realm": "master",
+    "type": "ConsoleAsset",
+    "attributes": {
+      "consoleVersion": {
+        "name": "consoleVersion",
+        "type": "text",
+        "meta": {},
+        "value": "148.0.0.0",
+        "timestamp": 1780396768958
+      },
+      "consolePlatform": {
+        "name": "consolePlatform",
+        "type": "text",
+        "meta": {},
+        "value": "Windows 10 64-bit",
+        "timestamp": 1780396768958
+      },
+      "notes": {
+        "name": "notes",
+        "type": "text",
+        "meta": {},
+        "value": null,
+        "timestamp": 1780396768958
+      },
+      "consoleProviders": {
+        "name": "consoleProviders",
+        "type": "consoleProviders",
+        "meta": {},
+        "value": {
+          "push": {
+            "version": "web",
+            "requiresPermission": false,
+            "hasPermission": true,
+            "success": true,
+            "enabled": true,
+            "disabled": false
+          }
+        },
+        "timestamp": 1780396768958
+      },
+      "consoleName": {
+        "name": "consoleName",
+        "type": "text",
+        "meta": {},
+        "value": "Microsoft Edge",
+        "timestamp": 1780396768958
+      },
+      "location": {
+        "name": "location",
+        "type": "GEO_JSONPoint",
+        "meta": {},
+        "value": null,
+        "timestamp": 1780396768958
+      }
+    }
+  },
+  {
+    "id": "65ZmmuhF3YagVPjjsJAgR0",
+    "version": 0,
+    "createdOn": 1780563295917,
+    "name": "Chrome",
+    "accessPublicRead": false,
+    "parentId": "6Q5zfMsILFTMC1QXzNKLdR",
+    "realm": "master",
+    "type": "ConsoleAsset",
+    "attributes": {
+      "consoleVersion": {
+        "name": "consoleVersion",
+        "type": "text",
+        "meta": {},
+        "value": "147.0.0.0",
+        "timestamp": 1780563295869
+      },
+      "consolePlatform": {
+        "name": "consolePlatform",
+        "type": "text",
+        "meta": {},
+        "value": "Linux 64-bit",
+        "timestamp": 1780563295869
+      },
+      "notes": {
+        "name": "notes",
+        "type": "text",
+        "meta": {},
+        "value": null,
+        "timestamp": 1780563295869
+      },
+      "consoleProviders": {
+        "name": "consoleProviders",
+        "type": "consoleProviders",
+        "meta": {},
+        "value": {
+          "push": {
+            "version": "web",
+            "requiresPermission": false,
+            "hasPermission": true,
+            "success": true,
+            "enabled": true,
+            "disabled": false
+          }
+        },
+        "timestamp": 1780563295869
+      },
+      "consoleName": {
+        "name": "consoleName",
+        "type": "text",
+        "meta": {},
+        "value": "Chrome",
+        "timestamp": 1780563295869
+      },
+      "location": {
+        "name": "location",
+        "type": "GEO_JSONPoint",
+        "meta": {},
+        "value": null,
+        "timestamp": 1780563295869
+      }
+    }
+  },
+  {
+    "id": "3VIYFS5tPB132eP0XwU02x",
+    "version": 0,
+    "createdOn": 1780579455103,
+    "name": "Chrome",
+    "accessPublicRead": false,
+    "parentId": "6Q5zfMsILFTMC1QXzNKLdR",
+    "realm": "master",
+    "type": "ConsoleAsset",
+    "attributes": {
+      "consoleVersion": {
+        "name": "consoleVersion",
+        "type": "text",
+        "meta": {},
+        "value": "147.0.0.0",
+        "timestamp": 1780579455052
+      },
+      "consolePlatform": {
+        "name": "consolePlatform",
+        "type": "text",
+        "meta": {},
+        "value": "Linux 64-bit",
+        "timestamp": 1780579455052
+      },
+      "notes": {
+        "name": "notes",
+        "type": "text",
+        "meta": {},
+        "value": null,
+        "timestamp": 1780579455052
+      },
+      "consoleProviders": {
+        "name": "consoleProviders",
+        "type": "consoleProviders",
+        "meta": {},
+        "value": {
+          "push": {
+            "version": "web",
+            "requiresPermission": false,
+            "hasPermission": true,
+            "success": true,
+            "enabled": true,
+            "disabled": false
+          }
+        },
+        "timestamp": 1780579455052
+      },
+      "consoleName": {
+        "name": "consoleName",
+        "type": "text",
+        "meta": {},
+        "value": "Chrome",
+        "timestamp": 1780579455052
+      },
+      "location": {
+        "name": "location",
+        "type": "GEO_JSONPoint",
+        "meta": {},
+        "value": null,
+        "timestamp": 1780579455052
+      }
+    }
+  }
+]
