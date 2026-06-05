@@ -1,6 +1,6 @@
 #!/bin/bash
 # ================================================================
-# SMS IoT Platform — Smart Installer v2.0
+# SMS IoT Platform — Smart Installer v2.1
 # github.com/adnankhanodoo/sms-iot-deploy
 # ================================================================
 
@@ -15,21 +15,39 @@ success() { echo -e "${GREEN}  ✓${NC} $1"; }
 warn()    { echo -e "${YELLOW}  ⚠${NC} $1"; }
 error()   { echo -e "${RED}  ✗${NC} $1"; exit 1; }
 step()    { echo -e "\n${CYAN}${BOLD}══ $1 ══${NC}"; }
-progress(){ echo -ne "${BLUE}  ▸${NC} $1..."; }
-done_msg(){ echo -e " ${GREEN}done${NC}"; }
+
+# ── Spinner function ──────────────────────────────────────────────
+spinner() {
+    local pid=$1
+    local msg=$2
+    local SPINCHARS="⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
+    local i=0
+    while kill -0 $pid 2>/dev/null; do
+        i=$(( (i+1) % 10 ))
+        echo -ne "\r${BLUE}  ▸${NC} $msg ${SPINCHARS:$i:1} "
+        sleep 0.1
+    done
+    wait $pid
+    local exit_code=$?
+    if [ $exit_code -eq 0 ]; then
+        echo -e "\r${GREEN}  ✓${NC} $msg      "
+    else
+        echo -e "\r${RED}  ✗${NC} $msg failed"
+        return $exit_code
+    fi
+}
 
 # ── Banner ────────────────────────────────────────────────────────
 clear
 echo -e "${CYAN}${BOLD}"
 echo "  ╔═══════════════════════════════════════════════════╗"
-echo "  ║         SMS IoT Platform Installer v2.0          ║"
+echo "  ║         SMS IoT Platform Installer v2.1          ║"
 echo "  ║         github.com/adnankhanodoo/sms-iot-deploy  ║"
 echo "  ╚═══════════════════════════════════════════════════╝"
 echo -e "${NC}"
 
-# ── Detect IP automatically ───────────────────────────────────────
+# ── Detect IP ─────────────────────────────────────────────────────
 detect_ip() {
-    # Try to get the primary LAN IP (not loopback, not docker)
     IP=$(ip route get 8.8.8.8 2>/dev/null | grep -oP 'src \K\S+' | head -1)
     if [ -z "$IP" ]; then
         IP=$(hostname -I | awk '{for(i=1;i<=NF;i++) if($i !~ /^172\.|^127\./) {print $i; exit}}')
@@ -60,7 +78,6 @@ echo ""
 read -r -p "  Enter choice [1-5]: " CHOICE
 echo ""
 
-# ── Validate choice ───────────────────────────────────────────────
 case $CHOICE in
     1) MODE="full" ;;
     2) MODE="openremote" ;;
@@ -70,7 +87,6 @@ case $CHOICE in
     *) error "Invalid choice" ;;
 esac
 
-# ── Ask Zigbee only for full install ─────────────────────────────
 DEPLOY_ZIGBEE="n"
 if [ "$MODE" = "full" ]; then
     read -r -p "  Deploy Zigbee2MQTT? (requires USB dongle) [y/n]: " DEPLOY_ZIGBEE
@@ -89,119 +105,82 @@ read -r -p "  Continue? [y/n]: " CONFIRM
 if [ "$MODE" = "fix_network" ]; then
     step "Fixing Network Configuration"
     info "Detected IP: $DEVICE_IP"
-
     if docker ps | grep -q smarthome-postgresql; then
-        progress "Updating MQTT agent IPs in OpenRemote"
         docker exec smarthome-postgresql psql -U postgres openremote -c \
-            "UPDATE asset SET attributes = jsonb_set(attributes, '{host,value}', '\"mosquitto\"') WHERE type = 'MQTTAgent';" 2>/dev/null || true
-        done_msg
+            "UPDATE asset SET attributes = jsonb_set(attributes, '{host,value}', '\"mosquitto\"') WHERE type = 'MQTTAgent';" &>/dev/null || true
         docker restart smarthome-manager &>/dev/null
-        success "OpenRemote MQTT agents updated"
+        success "MQTT agents updated to use hostname"
     fi
-
     if docker ps | grep -q frigate; then
-        progress "Updating Frigate MQTT config"
         CONFIG="$INSTALL_DIR/frigate/config/config.yml"
-        [ -f "$CONFIG" ] && python3 -c "
-import re, sys
-c = open('$CONFIG').read()
-c = re.sub(r'host:.*', 'host: mosquitto', c, count=1)
-open('$CONFIG', 'w').write(c)
-"
+        [ -f "$CONFIG" ] && sed -i 's/^  host: .*/  host: mosquitto/' "$CONFIG"
         docker restart frigate &>/dev/null
-        done_msg
         success "Frigate MQTT updated"
     fi
-
-    echo ""
     success "Network configuration fixed!"
     exit 0
 fi
 
-# ── Step 1: Install system dependencies ──────────────────────────
+# ── Step 1: System Dependencies ───────────────────────────────────
 step "Step 1/7: Installing System Dependencies"
+( $SUDO apt-get update -qq 2>/dev/null ) &
+spinner $! "Updating package lists"
 
-progress "Updating package lists"
-$SUDO apt-get update -qq 2>/dev/null
-done_msg
-
-progress "Installing required packages"
-$SUDO apt-get install -y -qq curl git openssl python3 ca-certificates gnupg lsb-release 2>/dev/null
-done_msg
+( $SUDO apt-get install -y -qq curl git openssl python3 ca-certificates gnupg lsb-release 2>/dev/null ) &
+spinner $! "Installing required packages"
 success "System packages ready"
 
-# ── Step 2: Install Docker ────────────────────────────────────────
+# ── Step 2: Docker ────────────────────────────────────────────────
 step "Step 2/7: Setting Up Docker"
-
 if command -v docker &>/dev/null; then
     success "Docker already installed ($(docker --version | cut -d' ' -f3 | tr -d ','))"
 else
-    progress "Downloading and installing Docker"
-    curl -fsSL https://get.docker.com | $SUDO sh &>/dev/null
-    done_msg
+    info "Downloading and installing Docker (this takes 2-3 minutes)..."
+    ( curl -fsSL https://get.docker.com | $SUDO sh ) &>/dev/null &
+    spinner $! "Installing Docker engine"
     $SUDO usermod -aG docker ${SUDO_USER:-$USER} 2>/dev/null || true
     success "Docker installed"
 
-    progress "Configuring Docker log limits"
-    $SUDO bash -c 'cat > /etc/docker/daemon.json << EOF
+    ( $SUDO bash -c 'cat > /etc/docker/daemon.json << EOF
 {"log-driver":"json-file","log-opts":{"max-size":"10m","max-file":"3"}}
-EOF'
-    $SUDO systemctl restart docker &>/dev/null
+EOF
+systemctl restart docker' ) &>/dev/null &
+    spinner $! "Configuring Docker log limits"
     sleep 3
-    done_msg
 fi
 
 # ── Step 3: Clone/Update repo ─────────────────────────────────────
 step "Step 3/7: Setting Up Installation Files"
-
 if [ -d "$INSTALL_DIR/.git" ]; then
-    progress "Updating existing installation files"
-    git -C $INSTALL_DIR fetch origin &>/dev/null
-    git -C $INSTALL_DIR reset --hard origin/main &>/dev/null
-    done_msg
-    success "Files updated from GitHub"
+    ( git -C $INSTALL_DIR fetch origin &>/dev/null && git -C $INSTALL_DIR reset --hard origin/main &>/dev/null ) &
+    spinner $! "Updating installation files from GitHub"
+    success "Files updated"
 else
-    progress "Downloading installation files from GitHub"
-    git clone $REPO_URL $INSTALL_DIR &>/dev/null
-    done_msg
+    ( git clone $REPO_URL $INSTALL_DIR &>/dev/null ) &
+    spinner $! "Downloading files from GitHub"
     success "Files downloaded to $INSTALL_DIR"
 fi
-
 cd $INSTALL_DIR
 
-# ── Step 4: Generate SSL cert ─────────────────────────────────────
+# ── Step 4: SSL cert ──────────────────────────────────────────────
 step "Step 4/7: Generating SSL Certificate"
-
 mkdir -p ssl
 if [ ! -f ssl/frigate.crt ]; then
-    progress "Generating self-signed SSL certificate"
-    openssl req -x509 -nodes -days 3650 -newkey rsa:2048 \
+    ( openssl req -x509 -nodes -days 3650 -newkey rsa:2048 \
         -keyout ssl/frigate.key -out ssl/frigate.crt \
-        -subj "/CN=$DEVICE_IP" 2>/dev/null
-    done_msg
-    success "SSL certificate generated (10 years)"
+        -subj "/CN=$DEVICE_IP" 2>/dev/null ) &
+    spinner $! "Generating self-signed SSL certificate (10 years)"
 else
     success "SSL certificate already exists"
 fi
 
-# ── Step 5: Generate docker-compose ──────────────────────────────
+# ── Step 5: docker-compose ────────────────────────────────────────
 step "Step 5/7: Configuring Services"
 
-progress "Generating docker-compose.yml"
 python3 << PYEOF
-import sys
 mode = "$MODE"
 zigbee = "$DEPLOY_ZIGBEE".lower() in ('y','yes')
-device_ip = "$DEVICE_IP"
-
-deploy_or = mode in ('full', 'openremote', 'update')
 deploy_frigate = mode in ('full', 'frigate', 'update')
-
-# Read existing compose if updating
-import os
-existing = ""
-if os.path.exists("docker-compose.yml"):
-    existing = open("docker-compose.yml").read()
 
 compose = """services:
 
@@ -317,96 +296,96 @@ volumes:
   keycloak-data:
   mosquitto-data:
 """
-
 with open("docker-compose.yml","w") as f:
     f.write(compose)
-print("Generated")
 PYEOF
-done_msg
 success "docker-compose.yml configured"
 
-# ── Step 6: Pull images & start ───────────────────────────────────
+# ── Step 6: Pull & Start ──────────────────────────────────────────
 step "Step 6/7: Downloading & Starting Services"
-info "This may take 5-15 minutes on first install..."
-echo ""
 
-# Get list of images to pull
+# Pull images one by one with progress
 IMAGES=$(docker compose config --images 2>/dev/null | sort -u)
 TOTAL=$(echo "$IMAGES" | wc -l)
 COUNT=0
-info "Pulling $TOTAL Docker images (first time takes 5-15 min)..."
+info "Downloading $TOTAL service images..."
 echo ""
 echo "$IMAGES" | while read -r img; do
     COUNT=$((COUNT + 1))
-    echo -ne "    ${BLUE}⬇${NC}  [$COUNT/$TOTAL] Downloading: ${CYAN}$img${NC}..."
-    docker pull "$img" &>/dev/null && echo -e " ${GREEN}done${NC}" || echo -e " ${YELLOW}cached${NC}"
+    PCT=$(( COUNT * 100 / TOTAL ))
+    # progress bar
+    FILLED=$(( PCT / 5 ))
+    BAR=""
+    for i in $(seq 1 20); do
+        [ $i -le $FILLED ] && BAR="${BAR}█" || BAR="${BAR}░"
+    done
+    echo -ne "\r  ${CYAN}[$BAR]${NC} ${PCT}%% [$COUNT/$TOTAL] ${CYAN}$img${NC}..."
+    docker pull "$img" &>/dev/null
+    echo -e "\r  ${GREEN}[$BAR]${NC} ${PCT}%% [$COUNT/$TOTAL] ${GREEN}✓${NC} $img          "
 done
 echo ""
-success "All images ready"
+success "All images downloaded"
 
-progress "Starting all services"
-docker compose up -d --remove-orphans 2>/dev/null || true
-done_msg
+( docker compose up -d --remove-orphans 2>/dev/null ) &
+spinner $! "Starting all services"
 success "All services started"
 
 # ── Step 7: Restore database ──────────────────────────────────────
-step "Step 7/7: Configuring & Restoring Data"
+step "Step 7/7: Restoring Data & Configuring"
 
 if [ -f "$INSTALL_DIR/openremote/openremote_db.sql.gz" ]; then
-    info "Waiting for PostgreSQL to be ready..."
+    # Wait for PostgreSQL
+    info "Waiting for PostgreSQL..."
     for i in $(seq 1 20); do
-        if docker exec smarthome-postgresql pg_isready -U postgres &>/dev/null; then
-            break
-        fi
+        docker exec smarthome-postgresql pg_isready -U postgres &>/dev/null && break
         sleep 3
+        echo -ne "\r  ${BLUE}▸${NC} Waiting for PostgreSQL... ($((i*3))s)"
     done
+    echo ""
 
-    progress "Stopping manager for clean restore"
-    docker stop smarthome-manager smarthome-keycloak &>/dev/null
-    sleep 3
-    done_msg
+    ( docker stop smarthome-manager smarthome-keycloak &>/dev/null; sleep 2 ) &
+    spinner $! "Stopping services for clean restore"
 
-    progress "Terminating existing DB connections"
-    docker exec smarthome-postgresql psql -U postgres -c \
-        "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname='openremote';" &>/dev/null || true
-    done_msg
+    ( docker exec smarthome-postgresql psql -U postgres -c \
+        "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname='openremote';" &>/dev/null; \
+      docker exec smarthome-postgresql psql -U postgres -c "DROP DATABASE IF EXISTS openremote;" &>/dev/null; \
+      docker exec smarthome-postgresql psql -U postgres -c "CREATE DATABASE openremote;" &>/dev/null ) &
+    spinner $! "Preparing fresh database"
 
-    progress "Dropping old database"
-    docker exec smarthome-postgresql psql -U postgres -c "DROP DATABASE IF EXISTS openremote;" &>/dev/null
-    done_msg
+    ( gunzip -c $INSTALL_DIR/openremote/openremote_db.sql.gz | \
+        docker exec -i smarthome-postgresql psql -U postgres openremote &>/dev/null ) &
+    spinner $! "Restoring assets, rules and settings"
 
-    progress "Creating fresh database"
-    docker exec smarthome-postgresql psql -U postgres -c "CREATE DATABASE openremote;" &>/dev/null
-    done_msg
+    ( docker exec smarthome-postgresql psql -U postgres openremote -c \
+        "UPDATE asset SET attributes = jsonb_set(attributes, '{host,value}', '\"mosquitto\"') WHERE type = 'MQTTAgent';" &>/dev/null ) &
+    spinner $! "Configuring MQTT hostname"
 
-    progress "Restoring OpenRemote data (assets, rules, settings)"
-    gunzip -c $INSTALL_DIR/openremote/openremote_db.sql.gz | \
-        docker exec -i smarthome-postgresql psql -U postgres openremote &>/dev/null
-    done_msg
-
-    progress "Setting MQTT agents to use hostname"
-    docker exec smarthome-postgresql psql -U postgres openremote -c \
-        "UPDATE asset SET attributes = jsonb_set(attributes, '{host,value}', '\"mosquitto\"') WHERE type = 'MQTTAgent';" &>/dev/null || true
-    done_msg
-
-    progress "Starting services"
-    docker start smarthome-keycloak smarthome-manager &>/dev/null
-    done_msg
-    success "Database restored with all assets and settings"
+    ( docker start smarthome-keycloak smarthome-manager &>/dev/null ) &
+    spinner $! "Starting OpenRemote services"
+    success "All data restored successfully"
 else
-    warn "No database backup found — starting with fresh OpenRemote"
+    warn "No database backup found — starting fresh"
 fi
 
-# ── Wait for OpenRemote ───────────────────────────────────────────
-progress "Waiting for OpenRemote to be ready"
-for i in $(seq 1 30); do
+# Wait for OpenRemote with progress
+info "Waiting for OpenRemote to be ready..."
+WAIT=0
+while [ $WAIT -lt 120 ]; do
     if curl -sk https://localhost/api/master/info &>/dev/null; then
         break
     fi
-    echo -n "."
-    sleep 5
+    WAIT=$((WAIT + 3))
+    PCT=$(( WAIT * 100 / 120 ))
+    [ $PCT -gt 100 ] && PCT=99
+    FILLED=$(( PCT / 5 ))
+    BAR=""
+    for i in $(seq 1 20); do
+        [ $i -le $FILLED ] && BAR="${BAR}█" || BAR="${BAR}░"
+    done
+    echo -ne "\r  ${CYAN}[$BAR]${NC} ${PCT}%% OpenRemote starting... (${WAIT}s)"
+    sleep 3
 done
-echo ""
+echo -e "\r  ${GREEN}[████████████████████]${NC} 100%% OpenRemote ready!          "
 success "OpenRemote is ready"
 
 # ── Final Summary ─────────────────────────────────────────────────
@@ -418,35 +397,40 @@ echo "  ╚═══════════════════════
 echo -e "${NC}"
 echo -e "  ${BOLD}Access your services:${NC}"
 echo ""
-echo -e "  ${CYAN}OpenRemote Dashboard${NC}"
-echo -e "    ${GREEN}https://$DEVICE_IP${NC}  →  login: admin / secret"
+echo -e "  ${CYAN}┌─ OpenRemote Dashboard ─────────────────────────────┐${NC}"
+echo -e "  ${CYAN}│${NC}  ${GREEN}https://$DEVICE_IP${NC}"
+echo -e "  ${CYAN}│${NC}  Login: ${YELLOW}admin${NC} / ${YELLOW}secret${NC}"
+echo -e "  ${CYAN}└────────────────────────────────────────────────────┘${NC}"
 echo ""
 
-if docker ps | grep -q "frigate"; then
-    echo -e "  ${CYAN}Frigate NVR${NC}"
-    echo -e "    ${GREEN}http://$DEVICE_IP:5000${NC}  →  camera management"
-    echo -e "    ${GREEN}https://$DEVICE_IP:8443${NC}  →  HTTPS (for mic/WebRTC)"
-    echo -e "    ${GREEN}http://$DEVICE_IP:1984${NC}  →  go2rtc stream viewer"
-    echo ""
+if docker ps | grep -q "^.*frigate[^-]"; then
+echo -e "  ${CYAN}┌─ Frigate NVR ──────────────────────────────────────┐${NC}"
+echo -e "  ${CYAN}│${NC}  ${GREEN}http://$DEVICE_IP:5000${NC}   (camera management)"
+echo -e "  ${CYAN}│${NC}  ${GREEN}https://$DEVICE_IP:8443${NC}  (HTTPS + WebRTC mic)"
+echo -e "  ${CYAN}│${NC}  ${GREEN}http://$DEVICE_IP:1984${NC}   (go2rtc streams)"
+echo -e "  ${CYAN}└────────────────────────────────────────────────────┘${NC}"
+echo ""
 fi
 
-echo -e "  ${CYAN}MQTT Broker${NC}"
-echo -e "    ${GREEN}$DEVICE_IP:1883${NC}  →  no auth required"
+echo -e "  ${CYAN}┌─ MQTT Broker ──────────────────────────────────────┐${NC}"
+echo -e "  ${CYAN}│${NC}  Host: ${GREEN}$DEVICE_IP:1883${NC}  (no auth)"
+echo -e "  ${CYAN}│${NC}  Container hostname: ${GREEN}mosquitto${NC}"
+echo -e "  ${CYAN}└────────────────────────────────────────────────────┘${NC}"
 echo ""
 
 if docker ps | grep -q "zigbee2mqtt"; then
-    echo -e "  ${CYAN}Zigbee2MQTT${NC}"
-    echo -e "    ${GREEN}http://$DEVICE_IP:8082${NC}  →  Zigbee device management"
-    echo ""
+echo -e "  ${CYAN}┌─ Zigbee2MQTT ──────────────────────────────────────┐${NC}"
+echo -e "  ${CYAN}│${NC}  ${GREEN}http://$DEVICE_IP:8082${NC}"
+echo -e "  ${CYAN}└────────────────────────────────────────────────────┘${NC}"
+echo ""
 fi
 
 echo -e "  ${BOLD}Useful commands:${NC}"
-echo -e "    Check services:  ${CYAN}docker ps${NC}"
-echo -e "    Update platform: ${CYAN}bash <(curl -fsSL https://raw.githubusercontent.com/adnankhanodoo/sms-iot-deploy/main/install.sh)${NC}"
-echo -e "    Fix network:     ${CYAN}bash ~/sms-iot/scripts/update_ip.sh${NC}"
+echo -e "    ${CYAN}docker ps${NC}                    — check running services"
+echo -e "    ${CYAN}bash ~/sms-iot/deploy.sh${NC}     — run this installer again"
 echo ""
 
-if [ "$EUID" -ne 0 ] && ! groups | grep -q docker; then
+if ! groups | grep -q docker 2>/dev/null; then
     warn "Log out and back in to use Docker without sudo"
 fi
 echo ""
