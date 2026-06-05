@@ -330,19 +330,19 @@ step "Step 6/7: Downloading & Starting Services"
 info "This may take 5-15 minutes on first install..."
 echo ""
 
-info "Pulling Docker images (please wait, first time takes 5-15 min)..."
+# Get list of images to pull
+IMAGES=$(docker compose config --images 2>/dev/null | sort -u)
+TOTAL=$(echo "$IMAGES" | wc -l)
+COUNT=0
+info "Pulling $TOTAL Docker images (first time takes 5-15 min)..."
 echo ""
-CURRENT_IMAGE=""
-docker compose pull 2>&1 | while IFS= read -r line; do
-    if echo "$line" | grep -qi "Pulling [a-z]"; then
-        CURRENT_IMAGE=$(echo "$line" | grep -oE "Pulling [a-zA-Z0-9/_:-]+" | sed "s/Pulling //")
-        echo -e "    ${BLUE}⬇${NC}  Downloading: ${CYAN}$CURRENT_IMAGE${NC}"
-    elif echo "$line" | grep -qi "Downloaded newer\|Image is up to date\|Pull complete"; then
-        echo -e "    ${GREEN}✓${NC}  Done: ${CYAN}$CURRENT_IMAGE${NC}"
-    fi
+echo "$IMAGES" | while read -r img; do
+    COUNT=$((COUNT + 1))
+    echo -ne "    ${BLUE}⬇${NC}  [$COUNT/$TOTAL] Downloading: ${CYAN}$img${NC}..."
+    docker pull "$img" &>/dev/null && echo -e " ${GREEN}done${NC}" || echo -e " ${YELLOW}cached${NC}"
 done
 echo ""
-success "All images downloaded"
+success "All images ready"
 
 progress "Starting all services"
 docker compose up -d --remove-orphans 2>/dev/null || true
