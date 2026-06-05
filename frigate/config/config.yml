@@ -3,7 +3,7 @@ auth:
 
 mqtt:
   enabled: true
-  host: 192.168.51.199
+  host: 192.168.50.199
   port: 1883
   topic_prefix: frigate-165
   client_id: frigate-165
@@ -22,7 +22,7 @@ go2rtc:
     listen: :8555
     candidates:
     - media.smsiotpk.com:8555
-    - 192.168.51.199:8555
+    - 192.168.50.199:8555
     ice_servers:
     - urls:
       - stun:stun.l.google.com:19302
