@@ -72,6 +72,8 @@ if [ -f "$INSTALL_DIR/openremote/openremote_db.sql.gz" ]; then
     info "Waiting for PostgreSQL to be ready..."
     sleep 15
     info "Restoring OpenRemote database..."
+    docker exec smarthome-postgresql psql -U postgres -c "DROP DATABASE IF EXISTS openremote;"
+    docker exec smarthome-postgresql psql -U postgres -c "CREATE DATABASE openremote;"
     gunzip -c $INSTALL_DIR/openremote/openremote_db.sql.gz | docker exec -i smarthome-postgresql psql -U postgres openremote 2>/dev/null
     docker restart smarthome-manager
     success "Database restored"
