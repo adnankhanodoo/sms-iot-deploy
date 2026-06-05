@@ -330,13 +330,17 @@ step "Step 6/7: Downloading & Starting Services"
 info "This may take 5-15 minutes on first install..."
 echo ""
 
-info "Pulling Docker images (this takes 5-15 min on first install)..."
+info "Pulling Docker images (please wait, first time takes 5-15 min)..."
+echo ""
 docker compose pull 2>&1 | while IFS= read -r line; do
-    if echo "$line" | grep -qiE "pulling|pulled|digest|downloaded|layer"; then
-        img=$(echo "$line" | grep -oP "(?<=Pulling )[^ ]+" || echo "")
-        [ -n "$img" ] && echo -e "    ${BLUE}▸${NC} Downloading: $img"
+    if echo "$line" | grep -qi "pulling"; then
+        name=$(echo "$line" | sed "s/.*Pulling //")
+        echo -e "    ${BLUE}⬇${NC}  Downloading: $name"
+    elif echo "$line" | grep -qi "pulled\|complete"; then
+        echo -e "    ${GREEN}✓${NC}  Image ready"
     fi
 done
+echo ""
 success "All images downloaded"
 
 progress "Starting all services"
