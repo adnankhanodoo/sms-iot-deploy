@@ -3,6 +3,11 @@
 # SMS IoT Platform — Smart Installer v3.0
 # github.com/adnankhanodoo/sms-iot-deploy
 cd $HOME
+# Re-run with sudo if docker not accessible
+if ! docker info >/dev/null 2>&1 && [ $EUID -ne 0 ]; then
+    echo -e "  Restarting with sudo for Docker access..."
+    exec sudo -E bash "$0" "$@"
+fi
 # ================================================================
 
 # ── Colors ───────────────────────────────────────────────────────
