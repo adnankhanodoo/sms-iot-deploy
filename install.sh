@@ -77,6 +77,14 @@ if [ -f "$INSTALL_DIR/openremote/openremote_db.sql.gz" ]; then
     gunzip -c $INSTALL_DIR/openremote/openremote_db.sql.gz | docker exec -i smarthome-postgresql psql -U postgres openremote 2>/dev/null
     docker restart smarthome-manager
     success "Database restored"
+
+    # Set MQTT agents to use container hostname instead of IP
+    info "Setting MQTT agents to use hostname 'mosquitto'..."
+    sleep 15
+    docker exec smarthome-postgresql psql -U postgres openremote -c \
+        "UPDATE asset SET attributes = jsonb_set(attributes, '{host,value}', '"mosquitto"') WHERE type = 'MQTTAgent';" 2>/dev/null || true
+    success "MQTT agents set to hostname: mosquitto"
+
 fi
 info "Waiting for OpenRemote (90s)..."
 for i in $(seq 1 18); do
