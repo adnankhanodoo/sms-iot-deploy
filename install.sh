@@ -66,6 +66,16 @@ docker compose pull
 docker compose up -d
 success "Services started"
 
+
+# Restore OpenRemote database
+if [ -f "$INSTALL_DIR/openremote/openremote_db.sql.gz" ]; then
+    info "Waiting for PostgreSQL to be ready..."
+    sleep 15
+    info "Restoring OpenRemote database..."
+    gunzip -c $INSTALL_DIR/openremote/openremote_db.sql.gz | docker exec -i smarthome-postgresql psql -U postgres openremote 2>/dev/null
+    docker restart smarthome-manager
+    success "Database restored"
+fi
 info "Waiting for OpenRemote (90s)..."
 for i in $(seq 1 18); do
     if curl -sk https://$DEVICE_IP/api/master/info &>/dev/null; then
