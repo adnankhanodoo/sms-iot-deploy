@@ -312,13 +312,6 @@ info "Downloading $TOTAL service images..."
 echo ""
 echo "$IMAGES" | while read -r img; do
     COUNT=$((COUNT + 1))
-    PCT=$(( COUNT * 100 / TOTAL ))
-    # progress bar
-    FILLED=$(( PCT / 5 ))
-    BAR=""
-    for i in $(seq 1 20); do
-        [ $i -le $FILLED ] && BAR="${BAR}█" || BAR="${BAR}░"
-    done
     echo -e "  ${BLUE}⬇${NC}  [$COUNT/$TOTAL] Downloading: ${CYAN}$img${NC}"
     docker pull "$img" 2>&1 | grep -E "Pulling from|Pull complete|Downloaded newer|Already exists" | while read -r l; do echo -e "    ${BLUE}▸${NC} $l"; done
     echo -e "  ${GREEN}✓${NC}  [$COUNT/$TOTAL] Ready: ${CYAN}$img${NC}\n"
