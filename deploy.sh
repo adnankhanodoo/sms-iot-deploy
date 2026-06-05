@@ -126,6 +126,8 @@ else
     info "Installing Docker (this takes 2-3 minutes)..."
     curl -fsSL https://get.docker.com | $SUDO sh
     $SUDO usermod -aG docker ${SUDO_USER:-$USER} 2>/dev/null || true
+    # Allow docker without logout
+    $SUDO chmod 666 /var/run/docker.sock 2>/dev/null || true
     success "Docker installed"
 
     info "Configuring Docker log limits..."
