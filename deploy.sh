@@ -80,18 +80,18 @@ if [ "$MODE" = "fix_network" ]; then
     step "Fixing Network Configuration"
     info "Device IP: $DEVICE_IP"
 
-    if docker ps --format '{{.Names}}' | grep -q smarthome-postgresql; then
+    if sudo docker ps --format '{{.Names}}' | grep -q smarthome-postgresql; then
         info "Updating MQTT agents to use hostname 'mosquitto'..."
-        docker exec smarthome-postgresql psql -U postgres openremote -c \
+        sudo docker exec smarthome-postgresql psql -U postgres openremote -c \
             "UPDATE asset SET attributes = jsonb_set(attributes, '{host,value}', '\"mosquitto\"') WHERE type = 'MQTTAgent';" 2>/dev/null && \
             success "MQTT agents updated" || warn "Could not update MQTT agents"
-        docker restart smarthome-manager >/dev/null 2>&1
+        sudo docker restart smarthome-manager >/dev/null 2>&1
         success "OpenRemote restarted"
     else
         warn "OpenRemote not running"
     fi
 
-    if docker ps --format '{{.Names}}' | grep -q "^frigate$"; then
+    if sudo docker ps --format '{{.Names}}' | grep -q "^frigate$"; then
         CONFIG="$INSTALL_DIR/frigate/config/config.yml"
         [ -f "$CONFIG" ] && sed -i 's/^  host: .*/  host: mosquitto/' "$CONFIG" && \
             docker restart frigate >/dev/null 2>&1 && success "Frigate MQTT updated"
@@ -306,7 +306,7 @@ success "Services configured"
 step "Step 5/6: Downloading & Starting Services"
 
 # Pull each image showing Docker's native output
-IMAGES=$(docker compose config --images 2>/dev/null | sort -u)
+IMAGES=$(sudo docker compose config --images 2>/dev/null | sort -u)
 TOTAL=$(echo "$IMAGES" | grep -c .)
 COUNT=0
 info "Downloading $TOTAL service images..."
@@ -316,7 +316,7 @@ echo "$IMAGES" | while read -r img; do
     [ -z "$img" ] && continue
     COUNT=$((COUNT + 1))
     echo -e "${CYAN}  ── [$COUNT/$TOTAL] $img ──────────────────────────────${NC}"
-    docker pull "$img"
+    sudo docker pull "$img"
     echo ""
 done
 
@@ -324,7 +324,7 @@ success "All images downloaded"
 echo ""
 
 info "Starting all services..."
-docker compose up -d 2>&1 | grep -v "^$" | while read -r line; do
+sudo docker compose up -d 2>&1 | grep -v "^$" | while read -r line; do
     echo "    $line"
 done
 success "All services started"
@@ -338,7 +338,7 @@ if [ -f "$INSTALL_DIR/openremote/openremote_db.sql.gz" ]; then
 
     info "Waiting for PostgreSQL to be ready..."
     for i in $(seq 1 30); do
-        if docker exec smarthome-postgresql pg_isready -U postgres >/dev/null 2>&1; then
+        if sudo docker exec smarthome-postgresql pg_isready -U postgres >/dev/null 2>&1; then
             success "PostgreSQL is ready"
             break
         fi
@@ -348,15 +348,15 @@ if [ -f "$INSTALL_DIR/openremote/openremote_db.sql.gz" ]; then
     echo ""
 
     info "Stopping manager for clean restore..."
-    docker stop smarthome-manager smarthome-keycloak >/dev/null 2>&1 || true
+    sudo docker stop smarthome-manager smarthome-keycloak >/dev/null 2>&1 || true
     sleep 3
 
     info "Dropping old database..."
-    docker exec smarthome-postgresql psql -U postgres -c \
+    sudo docker exec smarthome-postgresql psql -U postgres -c \
         "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname='openremote';" >/dev/null 2>&1 || true
-    docker exec smarthome-postgresql psql -U postgres -c \
+    sudo docker exec smarthome-postgresql psql -U postgres -c \
         "DROP DATABASE IF EXISTS openremote;" >/dev/null 2>&1
-    docker exec smarthome-postgresql psql -U postgres -c \
+    sudo docker exec smarthome-postgresql psql -U postgres -c \
         "CREATE DATABASE openremote;" >/dev/null 2>&1
     success "Fresh database created"
 
@@ -366,13 +366,13 @@ if [ -f "$INSTALL_DIR/openremote/openremote_db.sql.gz" ]; then
     success "Database restored"
 
     info "Starting manager..."
-    docker start smarthome-keycloak >/dev/null 2>&1
+    sudo docker start smarthome-keycloak >/dev/null 2>&1
     sleep 5
     docker start smarthome-manager >/dev/null 2>&1
 
     info "Waiting for asset table to be ready..."
     for i in $(seq 1 30); do
-        COUNT=$(docker exec smarthome-postgresql psql -U postgres openremote -t -c \
+        COUNT=$(sudo docker exec smarthome-postgresql psql -U postgres openremote -t -c \
             "SELECT count(*) FROM asset;" 2>/dev/null | tr -d ' ')
         if [ -n "$COUNT" ] && [ "$COUNT" -gt 0 ] 2>/dev/null; then
             success "Database ready — $COUNT assets found"
@@ -384,12 +384,12 @@ if [ -f "$INSTALL_DIR/openremote/openremote_db.sql.gz" ]; then
     echo ""
 
     info "Setting MQTT agents to use hostname..."
-    docker exec smarthome-postgresql psql -U postgres openremote -c \
+    sudo docker exec smarthome-postgresql psql -U postgres openremote -c \
         "UPDATE asset SET attributes = jsonb_set(attributes, '{host,value}', '\"mosquitto\"') WHERE type = 'MQTTAgent';" >/dev/null 2>&1 && \
         success "MQTT agents configured" || warn "MQTT agent update skipped"
 
     info "Restarting manager to apply changes..."
-    docker restart smarthome-manager >/dev/null 2>&1
+    sudo docker restart smarthome-manager >/dev/null 2>&1
     success "Manager restarted"
 
 else
@@ -409,7 +409,7 @@ done
 echo ""
 
 # Make sure proxy is running
-docker start smarthome-proxy >/dev/null 2>&1 || true
+sudo docker start smarthome-proxy >/dev/null 2>&1 || true
 
 # ── Final Summary ─────────────────────────────────────────────────
 echo ""
@@ -426,7 +426,7 @@ echo -e "    🌐  https://$DEVICE_IP"
 echo -e "    🔑  Login: admin / secret"
 echo ""
 
-if docker ps --format '{{.Names}}' | grep -q "^frigate$"; then
+if sudo docker ps --format '{{.Names}}' | grep -q "^frigate$"; then
 echo -e "  ${CYAN}Frigate NVR${NC}"
 echo -e "    📷  http://$DEVICE_IP:5000"
 echo -e "    🔒  https://$DEVICE_IP:8443  (WebRTC/mic)"
@@ -438,7 +438,7 @@ echo -e "  ${CYAN}MQTT Broker${NC}"
 echo -e "    📨  $DEVICE_IP:1883  (hostname: mosquitto)"
 echo ""
 
-if docker ps --format '{{.Names}}' | grep -q zigbee2mqtt; then
+if sudo docker ps --format '{{.Names}}' | grep -q zigbee2mqtt; then
 echo -e "  ${CYAN}Zigbee2MQTT${NC}"
 echo -e "    🔌  http://$DEVICE_IP:8082"
 echo ""
