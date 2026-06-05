@@ -330,11 +330,14 @@ step "Step 6/7: Downloading & Starting Services"
 info "This may take 5-15 minutes on first install..."
 echo ""
 
-progress "Pulling Docker images"
-docker compose pull 2>/dev/null | grep -E "Pull|pull|digest" | while read line; do
-    echo -e "    ${BLUE}▸${NC} $line"
+info "Pulling Docker images (this takes 5-15 min on first install)..."
+docker compose pull 2>&1 | while IFS= read -r line; do
+    if echo "$line" | grep -qiE "pulling|pulled|digest|downloaded|layer"; then
+        img=$(echo "$line" | grep -oP "(?<=Pulling )[^ ]+" || echo "")
+        [ -n "$img" ] && echo -e "    ${BLUE}▸${NC} Downloading: $img"
+    fi
 done
-done_msg
+success "All images downloaded"
 
 progress "Starting all services"
 docker compose up -d --remove-orphans 2>/dev/null || true
