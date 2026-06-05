@@ -3,7 +3,7 @@ auth:
 
 mqtt:
   enabled: true
-  host: 192.168.50.199
+  host: mosquitto
   port: 1883
   topic_prefix: frigate-165
   client_id: frigate-165
