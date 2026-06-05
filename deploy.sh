@@ -319,9 +319,9 @@ echo "$IMAGES" | while read -r img; do
     for i in $(seq 1 20); do
         [ $i -le $FILLED ] && BAR="${BAR}█" || BAR="${BAR}░"
     done
-    echo -ne "\r  ${CYAN}[$BAR]${NC} ${PCT}%% [$COUNT/$TOTAL] ${CYAN}$img${NC}..."
-    docker pull "$img" &>/dev/null
-    echo -e "\r  ${GREEN}[$BAR]${NC} ${PCT}%% [$COUNT/$TOTAL] ${GREEN}✓${NC} $img          "
+    echo -e "  ${BLUE}⬇${NC}  [$COUNT/$TOTAL] Downloading: ${CYAN}$img${NC}"
+    docker pull "$img" 2>&1 | grep -E "Pulling from|Pull complete|Downloaded newer|Already exists" | while read -r l; do echo -e "    ${BLUE}▸${NC} $l"; done
+    echo -e "  ${GREEN}✓${NC}  [$COUNT/$TOTAL] Ready: ${CYAN}$img${NC}\n"
 done
 echo ""
 success "All images downloaded"
@@ -382,55 +382,6 @@ while [ $WAIT -lt 120 ]; do
     for i in $(seq 1 20); do
         [ $i -le $FILLED ] && BAR="${BAR}█" || BAR="${BAR}░"
     done
-    echo -ne "\r  ${CYAN}[$BAR]${NC} ${PCT}%% OpenRemote starting... (${WAIT}s)"
-    sleep 3
-done
-echo -e "\r  ${GREEN}[████████████████████]${NC} 100%% OpenRemote ready!          "
-success "OpenRemote is ready"
-
-# ── Final Summary ─────────────────────────────────────────────────
-echo ""
-echo -e "${GREEN}${BOLD}"
-echo "  ╔═══════════════════════════════════════════════════╗"
-echo "  ║           Installation Complete! 🎉              ║"
-echo "  ╚═══════════════════════════════════════════════════╝"
-echo -e "${NC}"
-echo -e "  ${BOLD}Access your services:${NC}"
-echo ""
-echo -e "  ${CYAN}┌─ OpenRemote Dashboard ─────────────────────────────┐${NC}"
-echo -e "  ${CYAN}│${NC}  ${GREEN}https://$DEVICE_IP${NC}"
-echo -e "  ${CYAN}│${NC}  Login: ${YELLOW}admin${NC} / ${YELLOW}secret${NC}"
-echo -e "  ${CYAN}└────────────────────────────────────────────────────┘${NC}"
-echo ""
-
-if docker ps | grep -q "^.*frigate[^-]"; then
-echo -e "  ${CYAN}┌─ Frigate NVR ──────────────────────────────────────┐${NC}"
-echo -e "  ${CYAN}│${NC}  ${GREEN}http://$DEVICE_IP:5000${NC}   (camera management)"
-echo -e "  ${CYAN}│${NC}  ${GREEN}https://$DEVICE_IP:8443${NC}  (HTTPS + WebRTC mic)"
-echo -e "  ${CYAN}│${NC}  ${GREEN}http://$DEVICE_IP:1984${NC}   (go2rtc streams)"
-echo -e "  ${CYAN}└────────────────────────────────────────────────────┘${NC}"
-echo ""
-fi
-
-echo -e "  ${CYAN}┌─ MQTT Broker ──────────────────────────────────────┐${NC}"
-echo -e "  ${CYAN}│${NC}  Host: ${GREEN}$DEVICE_IP:1883${NC}  (no auth)"
-echo -e "  ${CYAN}│${NC}  Container hostname: ${GREEN}mosquitto${NC}"
-echo -e "  ${CYAN}└────────────────────────────────────────────────────┘${NC}"
-echo ""
-
-if docker ps | grep -q "zigbee2mqtt"; then
-echo -e "  ${CYAN}┌─ Zigbee2MQTT ──────────────────────────────────────┐${NC}"
-echo -e "  ${CYAN}│${NC}  ${GREEN}http://$DEVICE_IP:8082${NC}"
-echo -e "  ${CYAN}└────────────────────────────────────────────────────┘${NC}"
-echo ""
-fi
-
-echo -e "  ${BOLD}Useful commands:${NC}"
-echo -e "    ${CYAN}docker ps${NC}                    — check running services"
-echo -e "    ${CYAN}bash ~/sms-iot/deploy.sh${NC}     — run this installer again"
-echo ""
-
-if ! groups | grep -q docker 2>/dev/null; then
-    warn "Log out and back in to use Docker without sudo"
-fi
-echo ""
+    echo -e "  ${BLUE}⬇${NC}  [$COUNT/$TOTAL] Downloading: ${CYAN}$img${NC}"
+    docker pull "$img" 2>&1 | grep -E "Pulling from|Pull complete|Downloaded newer|Already exists" | while read -r l; do echo -e "    ${BLUE}▸${NC} $l"; done
+    echo -e "  ${GREEN}✓${NC}  [$COUNT/$TOTAL] Ready: ${CYAN}$img${NC}\n"
