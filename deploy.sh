@@ -332,12 +332,13 @@ echo ""
 
 info "Pulling Docker images (please wait, first time takes 5-15 min)..."
 echo ""
+CURRENT_IMAGE=""
 docker compose pull 2>&1 | while IFS= read -r line; do
-    if echo "$line" | grep -qi "pulling"; then
-        name=$(echo "$line" | sed "s/.*Pulling //")
-        echo -e "    ${BLUE}⬇${NC}  Downloading: $name"
-    elif echo "$line" | grep -qi "pulled\|complete"; then
-        echo -e "    ${GREEN}✓${NC}  Image ready"
+    if echo "$line" | grep -qi "Pulling [a-z]"; then
+        CURRENT_IMAGE=$(echo "$line" | grep -oE "Pulling [a-zA-Z0-9/_:-]+" | sed "s/Pulling //")
+        echo -e "    ${BLUE}⬇${NC}  Downloading: ${CYAN}$CURRENT_IMAGE${NC}"
+    elif echo "$line" | grep -qi "Downloaded newer\|Image is up to date\|Pull complete"; then
+        echo -e "    ${GREEN}✓${NC}  Done: ${CYAN}$CURRENT_IMAGE${NC}"
     fi
 done
 echo ""
