@@ -167,6 +167,27 @@ fi
 
 cd $INSTALL_DIR
 
+# Create Zigbee2MQTT config to skip onboarding
+mkdir -p zigbee2mqtt-data
+cat > zigbee2mqtt-data/configuration.yaml << ZEOF
+version: 5
+mqtt:
+  base_topic: zigbee2mqtt
+  server: mqtt://mosquitto:1883
+serial:
+  port: /dev/ttyUSB0
+  adapter: zstack
+advanced:
+  log_level: info
+frontend:
+  enabled: true
+  port: 8080
+  host: 0.0.0.0
+homeassistant:
+  enabled: false
+onboarding: false
+ZEOF
+
 # SSL cert
 mkdir -p ssl
 if [ ! -f ssl/frigate.crt ]; then
