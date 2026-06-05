@@ -3,6 +3,7 @@
 # SMS IoT Platform — Smart Installer v3.0
 # github.com/adnankhanodoo/sms-iot-deploy
 cd $HOME
+sudo chmod 666 /var/run/docker.sock 2>/dev/null || true
 # Re-run with sudo if docker not accessible
 if ! docker info >/dev/null 2>&1 && [ $EUID -ne 0 ]; then
     echo -e "  Restarting with sudo for Docker access..."
@@ -133,6 +134,7 @@ else
     $SUDO usermod -aG docker ${SUDO_USER:-$USER} 2>/dev/null || true
     # Allow docker without logout
     $SUDO chmod 666 /var/run/docker.sock 2>/dev/null || true
+    sudo chmod 666 /var/run/docker.sock 2>/dev/null || true
     success "Docker installed"
 
     info "Configuring Docker log limits..."
