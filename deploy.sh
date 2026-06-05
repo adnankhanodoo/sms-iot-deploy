@@ -135,7 +135,11 @@ else
     # Allow docker without logout
     $SUDO chmod 666 /var/run/docker.sock 2>/dev/null || true
     sudo chmod 666 /var/run/docker.sock 2>/dev/null || true
-    success "Docker installed"
+    $SUDO usermod -aG docker ${SUDO_USER:-$USER} 2>/dev/null || true
+    $SUDO grpconv 2>/dev/null || true
+    success "Docker installed — applying group permissions..."
+    # Re-execute script with docker group active
+    exec sg docker "$0"
 
     info "Configuring Docker log limits..."
     $SUDO bash -c 'cat > /etc/docker/daemon.json << EOF
