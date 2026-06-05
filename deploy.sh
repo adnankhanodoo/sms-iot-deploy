@@ -313,7 +313,13 @@ echo ""
 echo "$IMAGES" | while read -r img; do
     COUNT=$((COUNT + 1))
     echo -e "  ${BLUE}⬇${NC}  [$COUNT/$TOTAL] Downloading: ${CYAN}$img${NC}"
-    docker pull "$img" 2>&1 | grep -E "Pulling from|Pull complete|Downloaded newer|Already exists" | while read -r l; do echo -e "    ${BLUE}▸${NC} $l"; done
+    docker pull "$img" > /tmp/pull_out.txt 2>&1 &
+    PULL_PID=$!
+    while kill -0 $PULL_PID 2>/dev/null; do
+        echo -ne "."
+        sleep 2
+    done
+    wait $PULL_PID
     echo -e "  ${GREEN}✓${NC}  [$COUNT/$TOTAL] Ready: ${CYAN}$img${NC}\n"
 done
 echo ""
@@ -376,5 +382,11 @@ while [ $WAIT -lt 120 ]; do
         [ $i -le $FILLED ] && BAR="${BAR}█" || BAR="${BAR}░"
     done
     echo -e "  ${BLUE}⬇${NC}  [$COUNT/$TOTAL] Downloading: ${CYAN}$img${NC}"
-    docker pull "$img" 2>&1 | grep -E "Pulling from|Pull complete|Downloaded newer|Already exists" | while read -r l; do echo -e "    ${BLUE}▸${NC} $l"; done
+    docker pull "$img" > /tmp/pull_out.txt 2>&1 &
+    PULL_PID=$!
+    while kill -0 $PULL_PID 2>/dev/null; do
+        echo -ne "."
+        sleep 2
+    done
+    wait $PULL_PID
     echo -e "  ${GREEN}✓${NC}  [$COUNT/$TOTAL] Ready: ${CYAN}$img${NC}\n"
