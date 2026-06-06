@@ -136,9 +136,8 @@ else
     sudo chmod 666 /var/run/docker.sock 2>/dev/null || true
     $SUDO usermod -aG docker ${SUDO_USER:-$USER} 2>/dev/null || true
     $SUDO grpconv 2>/dev/null || true
-    success "Docker installed — applying group permissions..."
-    # Re-execute script with docker group active
-    exec sg docker "$0"
+    sudo chmod 666 /var/run/docker.sock 2>/dev/null || true
+    success "Docker installed"
 
     info "Configuring Docker log limits..."
     $SUDO bash -c 'cat > /etc/docker/daemon.json << EOF
