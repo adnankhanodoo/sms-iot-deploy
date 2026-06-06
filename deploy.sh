@@ -283,7 +283,7 @@ if zigbee:
     container_name: zigbee2mqtt
     restart: always
     user: "0:0"
-    ports: ["8082:8082"]
+    ports: ["8082:8080"]
     volumes:
       - ./zigbee2mqtt-data:/app/data
       - /run/udev:/run/udev:ro
