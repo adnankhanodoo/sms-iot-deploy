@@ -403,27 +403,26 @@ if [ -f "$INSTALL_DIR/openremote/openremote_db.sql.gz" ]; then
     sleep 5
     docker start smarthome-manager >/dev/null 2>&1
 
-    info "Waiting for asset table to be ready..."
-    for i in $(seq 1 30); do
+    info "Waiting for assets and configuring MQTT..."
+    MQTT_DONE=0
+    for i in $(seq 1 40); do
         COUNT=$(sudo docker exec smarthome-postgresql psql -U postgres openremote -t -c \
-            "SELECT count(*) FROM asset;" 2>/dev/null | tr -d ' ')
-        if [ -n "$COUNT" ] && [ "$COUNT" -gt 0 ] 2>/dev/null; then
+            "SELECT count(*) FROM asset;" 2>/dev/null | tr -d ' \n')
+        if [ -n "$COUNT" ] && [ "$COUNT" -gt "0" ] 2>/dev/null; then
             success "Database ready — $COUNT assets found"
+            sudo docker exec smarthome-postgresql psql -U postgres openremote -c \
+                "UPDATE asset SET attributes = jsonb_set(attributes, '\{host,value\}', '\"mosquitto\"') WHERE type = 'MQTTAgent';" >/dev/null 2>&1
+            success "MQTT agents configured"
+            sudo docker restart smarthome-manager >/dev/null 2>&1
+            success "Manager restarted"
+            MQTT_DONE=1
             break
         fi
-        echo -ne "\r    Initializing... ${i}s"
+        echo -ne "\r    Waiting for assets... ${i}s / ~120s"
         sleep 3
     done
     echo ""
-
-    info "Setting MQTT agents to use hostname..."
-    sudo docker exec smarthome-postgresql psql -U postgres openremote -c \
-        "UPDATE asset SET attributes = jsonb_set(attributes, '{host,value}', '\"mosquitto\"') WHERE type = 'MQTTAgent';" >/dev/null 2>&1 && \
-        success "MQTT agents configured" || warn "MQTT agent update skipped"
-
-    info "Restarting manager to apply changes..."
-    sudo docker restart smarthome-manager >/dev/null 2>&1
-    success "Manager restarted"
+    [ "$MQTT_DONE" = "0" ] && warn "Assets not loaded — run option 5 to fix network"
 
 else
     warn "No database backup found — starting with fresh OpenRemote"
