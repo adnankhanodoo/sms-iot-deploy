@@ -354,11 +354,13 @@ done
 success "All images downloaded"
 echo ""
 
+docker network rm sms-iot_default 2>/dev/null || true
 info "Starting all services..."
 sudo docker compose up -d 2>&1 | grep -v "^$" | while read -r line; do
     echo "    $line"
 done
 success "All services started"
+docker compose up -d proxy 2>/dev/null || true
 
 # ────────────────────────────────────────────────────────────────
 # STEP 6: Restore database
