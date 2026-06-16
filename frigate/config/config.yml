@@ -1,6 +1,5 @@
 auth:
   enabled: false
-
 mqtt:
   enabled: true
   host: mosquitto
@@ -8,32 +7,32 @@ mqtt:
   topic_prefix: frigate-165
   client_id: frigate-165
   stats_interval: 60
-
 go2rtc:
   streams:
     cam242:
-    - rtsp://sms:admin123@192.168.51.242:554/cam/realmonitor?channel=1&subtype=0#backchannel=0
+      - rtsp://sms:admin123@192.168.51.242:554/cam/realmonitor?channel=1&subtype=0#backchannel=0
+    cam242_sub:
+      - rtsp://sms:admin123@192.168.51.242:554/cam/realmonitor?channel=1&subtype=1
     cam243:
-    - rtsp://admin:Drd-7861@192.168.51.243:554/cam/realmonitor?channel=1&subtype=0
-    - ffmpeg:cam243#audio=opus#async
+      - rtsp://admin:Drd-7861@192.168.51.243:554/cam/realmonitor?channel=1&subtype=0
+      - ffmpeg:cam243#audio=aac
+      - ffmpeg:cam243#audio=opus
     cam243_sub:
-    - rtsp://admin:Drd-7861@192.168.51.243:554/cam/realmonitor?channel=1&subtype=1
+      - rtsp://admin:Drd-7861@192.168.51.243:554/cam/realmonitor?channel=1&subtype=1
   webrtc:
     listen: :8555
     candidates:
-    - media.smsiotpk.com:8555
-    - 192.168.50.199:8555
-    ice_servers:
-    - urls:
-      - stun:stun.l.google.com:19302
-
+      - media.smsiotpk.com:8555
+      - 192.168.50.199:8555
+      - 100.84.108.142:8555
+      - stun:8555
 objects:
   track:
-  - person
-  - car
-  - dog
-  - cat
-  - bird
+    - person
+    - car
+    - dog
+    - cat
+    - bird
   filters:
     person:
       min_score: 0.6
@@ -41,75 +40,97 @@ objects:
     car:
       min_score: 0.6
       threshold: 0.7
-
 record:
   enabled: true
+  continuous:
+    days: 7
   alerts:
+    pre_capture: 10
+    post_capture: 10
     retain:
-      days: 0.083
-      mode: motion
+      days: 7
+      mode: all
   detections:
+    pre_capture: 10
+    post_capture: 10
     retain:
-      days: 0.083
+      days: 7
       mode: motion
-
 snapshots:
   enabled: true
   bounding_box: true
   retain:
     default: 7
-
 cameras:
   cam242:
     enabled: true
     ffmpeg:
-      hwaccel_args: preset-rpi-64-h264
+      hwaccel_args: preset-intel-qsv-h264
       inputs:
-      - input_args: preset-rtsp-restream
-        path: rtsp://127.0.0.1:8554/cam242
-        roles:
-        - detect
-        - record
+        - input_args: preset-rtsp-restream
+          path: rtsp://127.0.0.1:8554/cam242_sub
+          roles:
+            - detect
+        - input_args: preset-rtsp-restream
+          path: rtsp://127.0.0.1:8554/cam242
+          roles:
+            - record
       output_args:
         record: preset-record-generic
     detect:
       enabled: true
-      width: 704
-      height: 576
+      width: 640
+      height: 360
       fps: 3
     record:
       enabled: true
+      continuous:
+        days: 7
     snapshots:
       enabled: true
+      bounding_box: true
+    live:
+      streams:
+        Main: cam242
+        Sub: cam242_sub
     motion:
-      threshold: 30
-      contour_area: 15
-
+      threshold: 50
+      contour_area: 50
+      improve_contrast: true
+    zones:
+      zone:
+        coordinates: 0.005,1,0.006,0.012,1,0.015,1,1
+        loitering_time: 0
+        friendly_name: Zone
   cam243:
     enabled: true
     ffmpeg:
-      hwaccel_args: preset-rpi-64-h264
+      hwaccel_args: preset-intel-qsv-h264
       inputs:
-      - input_args: preset-rtsp-restream
-        path: rtsp://127.0.0.1:8554/cam243_sub
-        roles:
-        - detect
-      - input_args: preset-rtsp-restream
-        path: rtsp://127.0.0.1:8554/cam243
-        roles:
-        - record
+        - input_args: preset-rtsp-restream
+          path: rtsp://127.0.0.1:8554/cam243_sub
+          roles:
+            - detect
+        - input_args: preset-rtsp-restream
+          path: rtsp://127.0.0.1:8554/cam243
+          roles:
+            - record
       output_args:
         record: preset-record-generic-audio-copy
     detect:
       enabled: true
-      width: 1280
-      height: 720
+      width: 640
+      height: 360
       fps: 3
     record:
       enabled: true
     snapshots:
       enabled: true
       bounding_box: true
+    live:
+      streams:
+        Main: cam243
+        Sub: cam243_sub
     motion:
       threshold: 30
       contour_area: 15
@@ -126,20 +147,25 @@ cameras:
         calibrate_on_startup: false
         zooming: disabled
         track:
-        - person
-        - car
+          - person
+          - car
         required_zones:
-        - full_frame
+          - full_frame
         return_preset: home
         timeout: 10
-
 semantic_search:
   enabled: false
+  model_size: small
 face_recognition:
   enabled: false
+  model_size: small
 lpr:
   enabled: false
 classification:
   bird:
-    enabled: true
+    enabled: false
 version: 0.17-0
+birdseye:
+  enabled: false
+  restream: true
+  idle_heartbeat_fps: 1

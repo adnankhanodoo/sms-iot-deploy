@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>PTT</title>
+</head>
+<body>
+
+<h2>PTT System</h2>
+
+<button id="connect">Connect</button>
+<button id="ptt">PTT</button>
+
+<script type="module">
+import {
+  Room,
+  RoomEvent,
+  createLocalTracks
+} from "https://esm.sh/livekit-client";
+
+const URL = "wss://127.0.0.1:7880";
+
+let room;
+let micTrack;
+
+async function getToken(identity) {
+  const res = await fetch(`https://127.0.0.1:3000/token?identity=${identity}`);
+  const data = await res.json();
+  return data.token;
+}
+
+document.getElementById("connect").onclick = async () => {
+  const TOKEN = await getToken("operator1");
+
+  room = new Room();
+
+  room.on(RoomEvent.TrackSubscribed, (track) => {
+    if (track.kind === "audio") {
+      const el = track.attach();
+      document.body.appendChild(el);
+      el.play();
+    }
+  });
+
+  await room.connect(URL, TOKEN);
+
+  const tracks = await createLocalTracks({ audio: true });
+  micTrack = tracks.find(t => t.kind === "audio");
+
+  await room.localParticipant.publishTrack(micTrack);
+
+  console.log("connected");
+};
+
+document.getElementById("ptt").onmousedown = () => {
+  micTrack?.setEnabled(true);
+};
+
+document.getElementById("ptt").onmouseup = () => {
+  micTrack?.setEnabled(false);
+};
+</script>
+
+</body>
+</html>
