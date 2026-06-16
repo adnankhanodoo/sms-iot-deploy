@@ -174,7 +174,12 @@ success "All services started"
 
 # ── RESTORE OPENREMOTE DATABASE ──────────────────────────────────
 if [ -f "$INSTALL_DIR/openremote/openremote_db.sql.gz" ]; then
-    info "Waiting for PostgreSQL (15s)..."
+    # Ensure proxy starts after manager is ready
+info "Starting proxy..."
+docker start smarthome-proxy 2>/dev/null || docker compose up -d proxy
+sleep 5
+
+info "Waiting for PostgreSQL (15s)..."
     sleep 15
     info "Restoring OpenRemote database..."
     docker exec smarthome-postgresql psql -U postgres -c "DROP DATABASE IF EXISTS openremote;" 2>/dev/null

@@ -8,7 +8,9 @@ compose=f"""services:
     image: openremote/proxy:latest
     container_name: smarthome-proxy
     restart: always
-    depends_on: [manager]
+    depends_on:
+      manager:
+        condition: service_healthy
     ports: ["80:80","443:443","8883:8883"]
     environment:
       - OR_HOSTNAME={OR_HOSTNAME}
