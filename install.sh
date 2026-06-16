@@ -24,13 +24,28 @@ fi
 
 # ── AUTO DETECT IP ────────────────────────────────────────────────
 AUTO_IP=$(hostname -I | awk '{print $1}')
+NETBIRD_IP=$(ip addr show wt0 2>/dev/null | grep "inet " | awk '{print $2}' | cut -d/ -f1)
+TAILSCALE_IP=$(ip addr show tailscale0 2>/dev/null | grep "inet " | awk '{print $2}' | cut -d/ -f1)
 
 # ── READ INPUT (works both piped and direct) ──────────────────────
 if [ -t 0 ]; then
     # Interactive mode
-    echo -e "  Detected IP: ${GREEN}$AUTO_IP${NC}"
-    read -r -p "  Device LAN IP [$AUTO_IP]: " DEVICE_IP
-    DEVICE_IP=${DEVICE_IP:-$AUTO_IP}
+    echo -e "  LAN IP:      ${GREEN}$AUTO_IP${NC}"
+    [ -n "$NETBIRD_IP" ] && echo -e "  NetBird VPN: ${BLUE}$NETBIRD_IP${NC}"
+    [ -n "$TAILSCALE_IP" ] && echo -e "  Tailscale:   ${BLUE}$TAILSCALE_IP${NC}"
+    echo ""
+    echo "  Which IP to use for OpenRemote?"
+    echo "  1) LAN IP ($AUTO_IP) — local network only"
+    [ -n "$NETBIRD_IP" ] && echo "  2) NetBird VPN ($NETBIRD_IP) — VPN access"
+    [ -n "$TAILSCALE_IP" ] && echo "  3) Tailscale ($TAILSCALE_IP) — VPN access"
+    echo "  4) Custom IP"
+    read -r -p "  Choice [1]: " IP_CHOICE
+    case "${IP_CHOICE:-1}" in
+        2) DEVICE_IP=${NETBIRD_IP:-$AUTO_IP} ;;
+        3) DEVICE_IP=${TAILSCALE_IP:-$AUTO_IP} ;;
+        4) read -r -p "  Enter IP: " DEVICE_IP ;;
+        *) DEVICE_IP=$AUTO_IP ;;
+    esac
     read -r -p "  OpenRemote hostname [$DEVICE_IP]: " OR_HOSTNAME
     OR_HOSTNAME=${OR_HOSTNAME:-$DEVICE_IP}
     read -r -p "  Deploy Frigate NVR? (y/n) [y]: " DEPLOY_FRIGATE
