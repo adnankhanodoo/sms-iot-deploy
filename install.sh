@@ -178,7 +178,7 @@ if [ -f "$INSTALL_DIR/openremote/openremote_db.sql.gz" ]; then
     docker exec smarthome-postgresql psql -U postgres -c "CREATE DATABASE openremote;" 2>/dev/null
     gunzip -c $INSTALL_DIR/openremote/openremote_db.sql.gz | \
         docker exec -i smarthome-postgresql psql -U postgres openremote 2>/dev/null
-    docker restart smarthome-manager
+    MANAGER=$(docker ps -a --format "{{.Names}}" | grep -i manager | head -1); docker restart $MANAGER 2>/dev/null || true
     success "Database restored"
 
     info "Updating MQTT agent hostname..."
