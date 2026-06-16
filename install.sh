@@ -167,6 +167,8 @@ fi
 info "Pulling Docker images (may take a few minutes)..."
 docker compose pull
 info "Starting all services..."
+# Remove immutable flag before SSL cert copy
+chattr -i ssl/fullchain.pem ssl/privkey.pem 2>/dev/null || true
 docker compose up -d
 success "All services started"
 
