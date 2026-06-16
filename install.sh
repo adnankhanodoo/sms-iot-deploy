@@ -46,8 +46,7 @@ if [ -t 0 ]; then
         4) read -r -p "  Enter IP: " DEVICE_IP ;;
         *) DEVICE_IP=$AUTO_IP ;;
     esac
-    read -r -p "  OpenRemote hostname [$DEVICE_IP]: " OR_HOSTNAME
-    OR_HOSTNAME=${OR_HOSTNAME:-$DEVICE_IP}
+    OR_HOSTNAME=$DEVICE_IP
     read -r -p "  Deploy Frigate NVR? (y/n) [y]: " DEPLOY_FRIGATE
     DEPLOY_FRIGATE=${DEPLOY_FRIGATE:-y}
     read -r -p "  Deploy Zigbee2MQTT? (y/n) [y]: " DEPLOY_ZIGBEE
