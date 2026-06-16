@@ -1,15 +1,8 @@
 #!/bin/bash
 # ================================================================
-# SMS Sentinel AI — Installer v2.1
+# SMS Sentinel AI — Installer v2.2
+# One command: curl -fsSL https://raw.githubusercontent.com/adnankhanodoo/sms-iot-deploy/main/install.sh | sudo bash
 # ================================================================
-
-# Auto re-run with sudo if needed
-if ! docker info &>/dev/null 2>&1; then
-    if [ "$EUID" -ne 0 ]; then
-        echo "Re-running with sudo..."
-        exec sudo bash "$0" "$@"
-    fi
-fi
 
 RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'; BLUE='\033[0;34m'; NC='\033[0m'
 info()    { echo -e "${BLUE}[INFO]${NC} $1"; }
@@ -19,46 +12,66 @@ error()   { echo -e "${RED}[ERROR]${NC} $1"; exit 1; }
 
 echo -e "${BLUE}"
 echo "╔══════════════════════════════════════════╗"
-echo "║    SMS Sentinel AI — Installer v2.1     ║"
+echo "║    SMS Sentinel AI — Installer v2.2     ║"
 echo "╚══════════════════════════════════════════╝"
 echo -e "${NC}"
 
-# ── AUTO DETECT IP ────────────────────────────────────────────────
-AUTO_IP=$(hostname -I | awk '{print $1}')
-echo -e "  Detected IP: ${GREEN}$AUTO_IP${NC}"
-read -r -p "  Device LAN IP [$AUTO_IP]: " DEVICE_IP
-DEVICE_IP=${DEVICE_IP:-$AUTO_IP}
-
-read -r -p "  OpenRemote hostname [$DEVICE_IP]: " OR_HOSTNAME
-OR_HOSTNAME=${OR_HOSTNAME:-$DEVICE_IP}
-
-read -r -p "  Deploy Frigate NVR? (y/n) [y]: " DEPLOY_FRIGATE
-DEPLOY_FRIGATE=${DEPLOY_FRIGATE:-y}
-
-read -r -p "  Deploy Zigbee2MQTT? (y/n) [y]: " DEPLOY_ZIGBEE
-DEPLOY_ZIGBEE=${DEPLOY_ZIGBEE:-y}
-
-read -r -p "  Enable Cloud Upload? (y/n) [y]: " DEPLOY_CLOUD
-DEPLOY_CLOUD=${DEPLOY_CLOUD:-y}
-
-if [[ "$DEPLOY_CLOUD" =~ ^[Yy]$ ]]; then
-    read -r -p "  Cloud Upload URL [https://portal.smsiotpk.com/sms-api/upload]: " UPLOAD_URL
-    UPLOAD_URL=${UPLOAD_URL:-https://portal.smsiotpk.com/sms-api/upload}
-    read -r -p "  Cloud Login URL [https://portal.smsiotpk.com/sms-api/auth/login]: " LOGIN_URL
-    LOGIN_URL=${LOGIN_URL:-https://portal.smsiotpk.com/sms-api/auth/login}
-    read -r -p "  Cloud Events Base URL [http://100.84.164.127:8181/api/events]: " CLOUD_BASE
-    CLOUD_BASE=${CLOUD_BASE:-http://100.84.164.127:8181/api/events}
-    read -r -p "  Cloud Username [sms]: " CLOUD_USER
-    CLOUD_USER=${CLOUD_USER:-sms}
-    read -r -p "  Cloud Password [SmsIoT@2026]: " CLOUD_PASS
-    CLOUD_PASS=${CLOUD_PASS:-SmsIoT@2026}
+# ── AUTO SUDO ────────────────────────────────────────────────────
+if [ "$EUID" -ne 0 ]; then
+    echo "Requesting sudo access..."
+    exec sudo bash "$0" "$@"
 fi
 
-read -r -p "  Frigate MQTT prefix [frigate-165]: " MQTT_PREFIX
-MQTT_PREFIX=${MQTT_PREFIX:-frigate-165}
+# ── AUTO DETECT IP ────────────────────────────────────────────────
+AUTO_IP=$(hostname -I | awk '{print $1}')
+
+# ── READ INPUT (works both piped and direct) ──────────────────────
+if [ -t 0 ]; then
+    # Interactive mode
+    echo -e "  Detected IP: ${GREEN}$AUTO_IP${NC}"
+    read -r -p "  Device LAN IP [$AUTO_IP]: " DEVICE_IP
+    DEVICE_IP=${DEVICE_IP:-$AUTO_IP}
+    read -r -p "  OpenRemote hostname [$DEVICE_IP]: " OR_HOSTNAME
+    OR_HOSTNAME=${OR_HOSTNAME:-$DEVICE_IP}
+    read -r -p "  Deploy Frigate NVR? (y/n) [y]: " DEPLOY_FRIGATE
+    DEPLOY_FRIGATE=${DEPLOY_FRIGATE:-y}
+    read -r -p "  Deploy Zigbee2MQTT? (y/n) [y]: " DEPLOY_ZIGBEE
+    DEPLOY_ZIGBEE=${DEPLOY_ZIGBEE:-y}
+    read -r -p "  Enable Cloud Upload? (y/n) [y]: " DEPLOY_CLOUD
+    DEPLOY_CLOUD=${DEPLOY_CLOUD:-y}
+    if [[ "$DEPLOY_CLOUD" =~ ^[Yy]$ ]]; then
+        read -r -p "  Cloud Upload URL [https://portal.smsiotpk.com/sms-api/upload]: " UPLOAD_URL
+        UPLOAD_URL=${UPLOAD_URL:-https://portal.smsiotpk.com/sms-api/upload}
+        read -r -p "  Cloud Login URL [https://portal.smsiotpk.com/sms-api/auth/login]: " LOGIN_URL
+        LOGIN_URL=${LOGIN_URL:-https://portal.smsiotpk.com/sms-api/auth/login}
+        read -r -p "  Cloud Events Base URL [http://100.84.164.127:8181/api/events]: " CLOUD_BASE
+        CLOUD_BASE=${CLOUD_BASE:-http://100.84.164.127:8181/api/events}
+        read -r -p "  Cloud Username [sms]: " CLOUD_USER
+        CLOUD_USER=${CLOUD_USER:-sms}
+        read -r -p "  Cloud Password [SmsIoT@2026]: " CLOUD_PASS
+        CLOUD_PASS=${CLOUD_PASS:-SmsIoT@2026}
+    fi
+    read -r -p "  Frigate MQTT prefix [frigate-165]: " MQTT_PREFIX
+    MQTT_PREFIX=${MQTT_PREFIX:-frigate-165}
+else
+    # Piped mode — use all defaults
+    DEVICE_IP=$AUTO_IP
+    OR_HOSTNAME=$AUTO_IP
+    DEPLOY_FRIGATE=y
+    DEPLOY_ZIGBEE=y
+    DEPLOY_CLOUD=y
+    UPLOAD_URL="https://portal.smsiotpk.com/sms-api/upload"
+    LOGIN_URL="https://portal.smsiotpk.com/sms-api/auth/login"
+    CLOUD_BASE="http://100.84.164.127:8181/api/events"
+    CLOUD_USER="sms"
+    CLOUD_PASS="SmsIoT@2026"
+    MQTT_PREFIX="frigate-165"
+    echo -e "  ${YELLOW}Running in auto mode with defaults${NC}"
+    echo -e "  Device IP: ${GREEN}$DEVICE_IP${NC}"
+fi
 
 echo ""
-info "Starting installation..."
+info "Starting SMS Sentinel AI installation..."
 
 # ── DEPENDENCIES ─────────────────────────────────────────────────
 info "Installing system dependencies..."
@@ -93,9 +106,10 @@ openssl req -x509 -nodes -days 36500 -newkey rsa:2048 \
     -keyout ssl/frigate.key -out ssl/frigate.crt \
     -subj "/C=PK/ST=Islamabad/L=Islamabad/O=SMS/OU=IT/CN=$DEVICE_IP" 2>/dev/null
 cat ssl/frigate.crt ssl/frigate.key > ssl/shared.pem
+cp ssl/frigate.key ssl/shared.key
+cp ssl/frigate.crt ssl/shared.crt
 cp ssl/frigate.crt ssl/fullchain.pem
 cp ssl/frigate.key ssl/privkey.pem
-# Make immutable so Frigate doesn't overwrite
 chattr +i ssl/fullchain.pem ssl/privkey.pem 2>/dev/null || true
 success "SSL certs generated"
 
@@ -118,12 +132,12 @@ sed -i "s/192\.168\.51\.211/$DEVICE_IP/g" \
 # ── UPDATE EVENT QUEUE ────────────────────────────────────────────
 if [[ "$DEPLOY_CLOUD" =~ ^[Yy]$ ]]; then
     info "Configuring cloud upload..."
-    sed -i "s|UPLOAD_URL = .*|UPLOAD_URL = \"$UPLOAD_URL\"|" event-queue/event_queue.py
-    sed -i "s|LOGIN_URL = .*|LOGIN_URL = \"$LOGIN_URL\"|" event-queue/event_queue.py
-    sed -i "s|CLOUD_BASE = .*|CLOUD_BASE = \"$CLOUD_BASE\"|" event-queue/event_queue.py
-    sed -i "s|CLOUD_USER = .*|CLOUD_USER = \"$CLOUD_USER\"|" event-queue/event_queue.py
-    sed -i "s|CLOUD_PASS = .*|CLOUD_PASS = \"$CLOUD_PASS\"|" event-queue/event_queue.py
-    sed -i "s|SOURCE_TOPIC = .*|SOURCE_TOPIC = \"$MQTT_PREFIX/events\"|" event-queue/event_queue.py
+    sed -i "s|UPLOAD_URL = .*|UPLOAD_URL = \"$UPLOAD_URL\"|" event-queue/event_queue.py 2>/dev/null || true
+    sed -i "s|LOGIN_URL = .*|LOGIN_URL = \"$LOGIN_URL\"|" event-queue/event_queue.py 2>/dev/null || true
+    sed -i "s|CLOUD_BASE = .*|CLOUD_BASE = \"$CLOUD_BASE\"|" event-queue/event_queue.py 2>/dev/null || true
+    sed -i "s|CLOUD_USER = .*|CLOUD_USER = \"$CLOUD_USER\"|" event-queue/event_queue.py 2>/dev/null || true
+    sed -i "s|CLOUD_PASS = .*|CLOUD_PASS = \"$CLOUD_PASS\"|" event-queue/event_queue.py 2>/dev/null || true
+    sed -i "s|SOURCE_TOPIC = .*|SOURCE_TOPIC = \"$MQTT_PREFIX/events\"|" event-queue/event_queue.py 2>/dev/null || true
     success "Cloud upload configured"
 fi
 
@@ -149,7 +163,7 @@ EOF
 fi
 
 # ── START SERVICES ───────────────────────────────────────────────
-info "Pulling Docker images..."
+info "Pulling Docker images (may take a few minutes)..."
 docker compose pull
 info "Starting all services..."
 docker compose up -d
@@ -167,13 +181,12 @@ if [ -f "$INSTALL_DIR/openremote/openremote_db.sql.gz" ]; then
     docker restart smarthome-manager
     success "Database restored"
 
-    info "Updating MQTT agent to use hostname: mosquitto..."
+    info "Updating MQTT agent hostname..."
     sleep 15
     docker exec smarthome-postgresql psql -U postgres openremote -c \
         "UPDATE asset SET attributes = jsonb_set(attributes, '{host,value}', '\"mosquitto\"') \
          WHERE type = 'MQTTAgent';" 2>/dev/null || true
 
-    # Update MQTT prefix if changed
     if [ "$MQTT_PREFIX" != "frigate-165" ]; then
         info "Updating MQTT topics prefix to: $MQTT_PREFIX..."
         docker exec smarthome-postgresql psql -U postgres openremote -c \
@@ -206,7 +219,7 @@ if [[ "$DEPLOY_CLOUD" =~ ^[Yy]$ ]]; then
     cd $INSTALL_DIR
     docker compose build event-queue 2>/dev/null && \
     docker compose up -d event-queue && \
-        success "Event queue running" || warn "Event queue build failed — run manually: docker compose build event-queue"
+        success "Event queue running" || warn "Event queue build failed — check internet and retry: cd ~/sms-iot && docker compose build event-queue"
 fi
 
 # ── DONE ─────────────────────────────────────────────────────────
@@ -224,6 +237,6 @@ echo -e "  Cloud:       ${BLUE}$CLOUD_BASE${NC}"
 echo -e "  Event Queue: ${BLUE}docker logs -f sms-event-queue${NC}"
 fi
 echo ""
-echo -e "  ${YELLOW}Tip: Accept SSL certificate warning in browser${NC}"
-echo -e "  ${YELLOW}Tip: Run 'docker compose logs -f' to monitor${NC}"
+echo -e "  ${YELLOW}Tip: Accept SSL warning in browser${NC}"
+echo -e "  ${YELLOW}Tip: docker compose -f ~/sms-iot/docker-compose.yml logs -f${NC}"
 echo ""
