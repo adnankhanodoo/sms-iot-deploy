@@ -13,7 +13,9 @@ compose=f"""services:
     environment:
       - OR_HOSTNAME={OR_HOSTNAME}
       - OR_SSL_PORT=443
-    volumes: [proxy-data:/deployment]
+    volumes:
+      - proxy-data:/deployment
+      - ./ssl/shared.pem:/etc/haproxy/certs/iot.pem
   postgresql:
     image: openremote/postgresql:latest
     container_name: smarthome-postgresql
