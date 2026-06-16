@@ -110,6 +110,7 @@ cp ssl/frigate.key ssl/shared.key
 cp ssl/frigate.crt ssl/shared.crt
 cp ssl/frigate.crt ssl/fullchain.pem
 cp ssl/frigate.key ssl/privkey.pem
+chattr -i ssl/fullchain.pem ssl/privkey.pem 2>/dev/null || true
 chattr +i ssl/fullchain.pem ssl/privkey.pem 2>/dev/null || true
 success "SSL certs generated"
 
@@ -178,7 +179,7 @@ if [ -f "$INSTALL_DIR/openremote/openremote_db.sql.gz" ]; then
     docker exec smarthome-postgresql psql -U postgres -c "CREATE DATABASE openremote;" 2>/dev/null
     gunzip -c $INSTALL_DIR/openremote/openremote_db.sql.gz | \
         docker exec -i smarthome-postgresql psql -U postgres openremote 2>/dev/null
-    MANAGER=$(docker ps -a --format "{{.Names}}" | grep -i manager | head -1); docker restart $MANAGER 2>/dev/null || true
+    sleep 5; MANAGER=$(docker ps -a --format "{{.Names}}" | grep -i manager | head -1); echo "Manager container: $MANAGER"; [ -n "$MANAGER" ] && docker restart $MANAGER || true
     success "Database restored"
 
     info "Updating MQTT agent hostname..."
