@@ -91,6 +91,14 @@ if FRIGATE:
       - /dev/bus/usb:/dev/bus/usb
       - /dev/dri:/dev/dri
 """
+compose+="""  event-queue:
+    build: ./event-queue
+    container_name: sms-event-queue
+    restart: always
+    network_mode: host
+    volumes:
+      - ./event-queue/event_queue.py:/app/event_queue.py
+"""
 compose+="""volumes:
   proxy-data:
   manager-data:
