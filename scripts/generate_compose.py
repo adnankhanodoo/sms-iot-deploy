@@ -93,7 +93,8 @@ if FRIGATE:
       - /dev/bus/usb:/dev/bus/usb
       - /dev/dri:/dev/dri
 """
-compose+="""  event-queue:
+compose+="""
+  event-queue:
     build: ./event-queue
     container_name: sms-event-queue
     restart: always
