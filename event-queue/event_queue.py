@@ -20,8 +20,8 @@ UPLOAD_URL    = "https://100.84.164.127:8181/api/upload"
 UPLOAD_SECRET = "SmsIoT2026SecretKey"
 CLOUD_BASE    = "https://100.84.164.127:8181/api/events"
 PENDING_DIR   = "/tmp/pending_uploads"
-CLIP_BEFORE   = 13
-CLIP_AFTER    = 13
+CLIP_BEFORE   = 5
+CLIP_AFTER    = 5
 MIN_CLIP_SECONDS = 10      # if downloaded clip is shorter than this, retry the download
 DOWNLOAD_RETRIES = 2
 DOWNLOAD_RETRY_WAIT = 3    # seconds between download retries (lets Frigate finish buffering)
@@ -161,10 +161,21 @@ def download_and_upload(event_id, camera, after):
             print(f"❌ Could not download clip after {DOWNLOAD_RETRIES} attempts: {event_id}")
             return None, None
 
-        snap_resp = requests.get(f"{FRIGATE_URL}/api/events/{event_id}/snapshot.jpg", timeout=10)
+        # Retry snapshot download — Frigate may not have it ready immediately
         snap_tmp = os.path.join(PENDING_DIR, f"{event_id}.jpg")
-        with open(snap_tmp, "wb") as f:
-            f.write(snap_resp.content)
+        snap_ok = False
+        for attempt in range(8):
+            snap_resp = requests.get(f"{FRIGATE_URL}/api/events/{event_id}/snapshot.jpg", timeout=10)
+            if snap_resp.status_code == 200 and snap_resp.content[:2] == b'\xff\xd8':
+                with open(snap_tmp, "wb") as f:
+                    f.write(snap_resp.content)
+                snap_ok = True
+                break
+            print(f"⚠️  Snapshot not ready (attempt {attempt+1}), retrying in 5s...")
+            time.sleep(5)
+        if not snap_ok:
+            print(f"⚠️  Snapshot unavailable for {event_id[:20]} — skipping")
+            snap_tmp = None
 
         clip_name = f"{event_id}.mp4"
         snap_name = f"{event_id}.jpg"
@@ -282,6 +293,21 @@ def process_queue(client):
 client = mqtt.Client(client_id="sms-event-queue")
 client.on_connect = on_connect
 client.on_message = on_message
+
+def on_disconnect(client, userdata, rc):
+    if rc != 0:
+        print(f"⚠️ MQTT disconnected unexpectedly (rc={rc}), reconnecting...")
+        while True:
+            try:
+                client.reconnect()
+                print("✅ MQTT reconnected")
+                break
+            except Exception as e:
+                print(f"🔄 Reconnect failed: {e}, retrying in 10s...")
+                import time
+                time.sleep(10)
+
+client.on_disconnect = on_disconnect
 
 while True:
     try:
