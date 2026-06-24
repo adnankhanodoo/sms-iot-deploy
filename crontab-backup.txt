@@ -1,0 +1,3 @@
+*/3 * * * * /home/sms/sms-iot/scripts/router-watchdog.sh
+0 20 * * * curl -s 'http://192.168.2.1/goform/goform_set_cmd_process' -d 'isTest=false&goformId=REBOOT_DEVICE' -H 'Referer: http://192.168.2.1/index.html' >> /home/sms/sms-iot/scripts/router-watchdog.log 2>&1 # daily-router-reboot-8pm
+0 3 * * * curl -s 'http://192.168.2.1/goform/goform_set_cmd_process' -d 'isTest=false&goformId=REBOOT_DEVICE' -H 'Referer: http://192.168.2.1/index.html' >> /home/sms/sms-iot/scripts/router-watchdog.log 2>&1 # daily-router-reboot-3am
