@@ -4,11 +4,18 @@ REALM="master"
 CLIENT_ID="systemhealth"
 MQTT_USER="master:systemhealth"
 MQTT_PASS="kHiLElOeAeFfL9QnZt6Fo2UujsGSUY01"
-MQTT_HOST="localhost"
 MQTT_PORT="1883"
 
+# Auto-detect manager IP every time — survives Docker restarts
+get_mqtt_host() {
+    docker inspect smarthome-manager 2>/dev/null | \
+        python3 -c "import sys,json; data=json.load(sys.stdin); \
+        print(list(data[0]['NetworkSettings']['Networks'].values())[0]['IPAddress'])" 2>/dev/null
+}
+
 pub() {
-    mosquitto_pub -h $MQTT_HOST -p $MQTT_PORT \
+    local HOST=$(get_mqtt_host)
+    mosquitto_pub -h $HOST -p $MQTT_PORT \
         -u "$MQTT_USER" -P "$MQTT_PASS" -i "$CLIENT_ID" \
         -t "$REALM/$CLIENT_ID/writeattributevalue/$1/$ASSET_ID" \
         -m "$2"
